@@ -15,6 +15,7 @@ import {
 
 const calculators = [
   { title: "Financiamento", text: "Descubra quanto pode financiar e tenha uma noção das parcelas.", Icon: CalculatorIcon, href: "/calculadoras/financiamento" },
+  { title: "Faixa MCMV", text: "Descubra em qual faixa do Minha Casa Minha Vida sua renda familiar se enquadra.", Icon: HouseIcon, href: "/calculadoras/faixa-minha-casa-minha-vida" },
   { title: "Entrada", text: "Veja quanto precisa juntar e organize os recursos para a compra.", Icon: PiggyIcon },
   { title: "ITBI", text: "Entenda o imposto envolvido na transferência do imóvel.", Icon: BankIcon },
   { title: "Escritura", text: "Saiba quando ela é necessária e quais custos considerar.", Icon: FileIcon },
@@ -97,7 +98,7 @@ export default function Home() {
         <div className="container">
           <div className="section-heading">
             <div><span className="kicker">Comece pelos números</span><h2>Calculadoras</h2><p>Entenda os principais custos e organize cada etapa da compra.</p></div>
-            <span className="coming-link">Financiamento já disponível</span>
+            <span className="coming-link">2 calculadoras já disponíveis</span>
           </div>
           <div className="calculator-grid">
             {calculators.map(({ title, text, Icon, href }) => (
