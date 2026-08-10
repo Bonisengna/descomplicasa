@@ -10,7 +10,7 @@ export function Header() {
   return (
     <header className="site-header">
       <div className="container header-inner">
-        <a className="brand" href="#top" aria-label="Descomplicasa - início" onClick={close}>
+        <a className="brand" href="/" aria-label="Descomplicasa - início" onClick={close}>
           <span className="brand-dot" aria-hidden="true" />
           <span className="brand-copy">
             <strong>DESCOMPLICASA</strong>
@@ -32,11 +32,11 @@ export function Header() {
         </button>
 
         <nav id="main-navigation" className={`main-nav ${open ? "is-open" : ""}`} aria-label="Navegação principal">
-          <a href="#calculadoras" onClick={close}>Calculadoras</a>
-          <a href="#checklists" onClick={close}>Checklists</a>
-          <a href="#guias" onClick={close}>Guias</a>
-          <a href="#sobre" onClick={close}>Sobre</a>
-          <a className="button button-small" href="#calculadoras" onClick={close}>Começar agora <span aria-hidden="true">→</span></a>
+          <a href="/#calculadoras" onClick={close}>Calculadoras</a>
+          <a href="/#checklists" onClick={close}>Checklists</a>
+          <a href="/#guias" onClick={close}>Guias</a>
+          <a href="/#sobre" onClick={close}>Sobre</a>
+          <a className="button button-small" href="/calculadoras/financiamento" onClick={close}>Simular financiamento <span aria-hidden="true">→</span></a>
         </nav>
       </div>
     </header>
