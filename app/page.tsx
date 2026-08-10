@@ -22,12 +22,14 @@ const calculators = [
 ];
 
 const checklists = [
+  { title: "Documentos MCMV", text: "Separe os principais documentos antes de procurar o banco.", Icon: FolderIcon, href: "/checklists/documentos-mcmv" },
   { title: "Documentos", text: "Lista de documentos do comprador, vendedor e imóvel.", Icon: FolderIcon },
   { title: "Visita", text: "O que observar no imóvel antes de tomar uma decisão.", Icon: HouseIcon },
   { title: "Compra", text: "As principais etapas da negociação até as chaves.", Icon: ChecklistIcon },
 ];
 
 const guides = [
+  { title: "Minha Casa Minha Vida", text: "Faixas de renda, subsídios, juros, FGTS e regras atualizadas para 2026.", className: "guide-financing", href: "/guias/minha-casa-minha-vida" },
   { title: "Financiamento", text: "Como funciona, o que influencia a aprovação e quais custos observar.", className: "guide-financing" },
   { title: "FGTS", text: "Quando pode ser usado na compra e quais regras precisam ser verificadas.", className: "guide-fgts" },
   { title: "ITBI", text: "O que é, quando é pago e por que o valor pode variar por município.", className: "guide-itbi" },
@@ -118,13 +120,17 @@ export default function Home() {
         <div className="container">
           <div className="section-heading">
             <div><span className="kicker">Não esqueça nada importante</span><h2>Checklists</h2><p>Organize o que precisa ser conferido antes de avançar na compra.</p></div>
-            <span className="coming-link">Páginas em desenvolvimento</span>
+            <span className="coming-link">Documentos MCMV já disponível</span>
           </div>
           <div className="checklist-grid">
-            {checklists.map(({ title, text, Icon }) => (
+            {checklists.map(({ title, text, Icon, href }) => (
               <article className="check-card" key={title}>
                 <span className="check-icon"><Icon /></span>
-                <div><h3>{title}</h3><p>{text}</p><span className="text-status">Em breve</span></div>
+                <div>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                  {href ? <a className="text-status" href={href}>Abrir checklist →</a> : <span className="text-status">Em breve</span>}
+                </div>
               </article>
             ))}
           </div>
@@ -135,13 +141,17 @@ export default function Home() {
         <div className="container">
           <div className="section-heading">
             <div><span className="kicker">Entenda como funciona</span><h2>Guias</h2><p>Conteúdo prático para entender termos, custos e decisões da compra.</p></div>
-            <span className="coming-link">Conteúdos em preparação</span>
+            <span className="coming-link">Guia MCMV 2026 já disponível</span>
           </div>
           <div className="guides-grid">
             {guides.map((guide) => (
               <article className="guide-card" key={guide.title}>
                 <div className={`guide-visual ${guide.className}`} aria-hidden="true"><span>{guide.title}</span></div>
-                <div className="guide-body"><h3>{guide.title}</h3><p>{guide.text}</p><span className="text-status">Em breve</span></div>
+                <div className="guide-body">
+                  <h3>{guide.title}</h3>
+                  <p>{guide.text}</p>
+                  {guide.href ? <a className="text-status" href={guide.href}>Ler guia →</a> : <span className="text-status">Em breve</span>}
+                </div>
               </article>
             ))}
           </div>

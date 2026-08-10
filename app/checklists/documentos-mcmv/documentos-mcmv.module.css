@@ -1,0 +1,332 @@
+.hero {
+  padding: 54px 0 58px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, #fff 10%, var(--green-soft) 140%);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 32px;
+  color: var(--gray);
+  font-size: 12px;
+}
+
+.breadcrumb a:hover { color: var(--green); }
+.breadcrumb strong { color: var(--graphite); }
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 64px;
+  align-items: end;
+}
+
+.kicker {
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.hero h1,
+.checklistCard h2,
+.sideCard h2,
+.infoSection h2 {
+  font-family: "Manrope", sans-serif;
+  letter-spacing: -.05em;
+}
+
+.hero h1 {
+  max-width: 800px;
+  margin: 12px 0 18px;
+  font-size: clamp(44px, 6vw, 70px);
+  line-height: 1.02;
+}
+
+.hero p {
+  max-width: 760px;
+  margin: 0;
+  color: #405048;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.note {
+  padding: 23px;
+  border: 1px solid #cfe4d5;
+  border-radius: 17px;
+  background: rgba(255,255,255,.9);
+}
+
+.note strong {
+  display: block;
+  font-family: "Manrope", sans-serif;
+  font-size: 15px;
+}
+
+.note p {
+  margin-top: 9px;
+  color: var(--gray);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.content { padding: 62px 0 76px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 28px;
+  align-items: start;
+}
+
+.checklistCard,
+.sideCard {
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 18px 50px rgba(23,32,28,.05);
+}
+
+.checklistCard { padding: 30px; }
+
+.checklistHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.checklistCard h2 {
+  margin: 8px 0 8px;
+  font-size: 30px;
+}
+
+.checklistHeader p {
+  max-width: 660px;
+  margin: 0;
+  color: var(--gray);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.progressValue {
+  flex: 0 0 auto;
+  min-width: 88px;
+  text-align: right;
+}
+
+.progressValue strong {
+  display: block;
+  color: var(--green);
+  font-family: "Manrope", sans-serif;
+  font-size: 28px;
+}
+
+.progressValue span {
+  color: var(--gray);
+  font-size: 10px;
+}
+
+.progressBar {
+  overflow: hidden;
+  height: 8px;
+  margin: 24px 0 28px;
+  border-radius: 999px;
+  background: #e8eee9;
+}
+
+.progressBar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--green);
+  transition: width .2s ease;
+}
+
+.items {
+  display: grid;
+  gap: 11px;
+}
+
+.item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 13px;
+  align-items: start;
+  padding: 17px 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease, transform .2s ease;
+}
+
+.item:hover {
+  transform: translateY(-1px);
+  border-color: #b7d7c0;
+}
+
+.item input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.customCheck {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #bdcdc2;
+  border-radius: 7px;
+  background: white;
+  color: white;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.itemChecked {
+  border-color: #b9d9c2;
+  background: #f5fbf7;
+}
+
+.itemChecked .customCheck {
+  border-color: var(--green);
+  background: var(--green);
+}
+
+.itemCopy strong {
+  display: block;
+  font-family: "Manrope", sans-serif;
+  font-size: 14px;
+}
+
+.itemCopy small {
+  display: block;
+  margin-top: 5px;
+  color: var(--gray);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.checklistFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  color: var(--gray);
+  font-size: 11px;
+}
+
+.checklistFooter button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--green-dark);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.sideCard {
+  position: sticky;
+  top: 116px;
+  padding: 26px;
+}
+
+.sideCard h2 {
+  margin: 9px 0 24px;
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.sideItem {
+  padding: 19px 0;
+  border-top: 1px solid var(--border);
+}
+
+.sideItem strong {
+  font-family: "Manrope", sans-serif;
+  font-size: 14px;
+}
+
+.sideItem p {
+  margin: 7px 0 12px;
+  color: var(--gray);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.sideItem a,
+.infoSection a {
+  color: var(--green-dark);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.sideItem a:hover,
+.infoSection a:hover { color: var(--green); }
+
+.infoSection {
+  padding: 62px 0;
+  border-top: 1px solid var(--border);
+  background: var(--green-soft);
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: .75fr 1fr;
+  gap: 90px;
+  align-items: start;
+}
+
+.infoSection h2 {
+  margin: 10px 0 0;
+  font-size: 38px;
+}
+
+.infoGrid p {
+  margin: 4px 0 16px;
+  color: #3f4d45;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.disclaimer {
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
+  color: var(--gray);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+@media (max-width: 920px) {
+  .heroGrid,
+  .grid,
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heroGrid { gap: 30px; }
+  .note { max-width: 600px; }
+  .sideCard { position: static; }
+  .infoGrid { gap: 24px; }
+}
+
+@media (max-width: 620px) {
+  .hero { padding: 34px 0 44px; }
+  .breadcrumb { flex-wrap: wrap; }
+  .hero h1 { font-size: 42px; }
+  .content { padding: 40px 0 56px; }
+  .checklistCard { padding: 21px; }
+  .checklistHeader { flex-direction: column; gap: 15px; }
+  .progressValue { text-align: left; }
+  .checklistFooter { align-items: flex-start; flex-direction: column; }
+  .infoSection { padding: 48px 0; }
+}
