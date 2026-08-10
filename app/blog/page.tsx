@@ -12,11 +12,22 @@ const articles = [
   {
     category: "Financiamento",
     date: "10 de agosto de 2026",
+    dateTime: "2026-08-10",
+    title: "Por que é considerada a renda bruta no financiamento imobiliário? Isso é correto?",
+    description:
+      "Entenda por que bancos usam a renda bruta, onde esse critério faz sentido e por que ele não basta para saber se a prestação realmente cabe no orçamento.",
+    href: "/guias/renda-bruta-financiamento-imobiliario",
+    featured: true,
+  },
+  {
+    category: "Financiamento",
+    date: "10 de agosto de 2026",
+    dateTime: "2026-08-10",
     title: "A inadimplência nos financiamentos imobiliários está crescendo. O que isso muda para quem vai comprar um imóvel?",
     description:
       "Os atrasos acima de 90 dias voltaram a subir nas linhas imobiliárias reguladas em 2026. Entenda os números e como financiar com mais margem de segurança.",
     href: "/guias/inadimplencia-financiamento-imobiliario",
-    featured: true,
+    featured: false,
   },
 ];
 
@@ -44,16 +55,16 @@ export default function BlogPage() {
           </div>
 
           <div className={styles.articleGrid}>
-            {articles.map((article) => (
+            {articles.map((article, index) => (
               <article className={article.featured ? styles.featuredCard : styles.card} key={article.href}>
                 <div className={styles.visual} aria-hidden="true">
-                  <span>01</span>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
                   <div />
                 </div>
                 <div className={styles.cardBody}>
                   <div className={styles.meta}>
                     <span>{article.category}</span>
-                    <time dateTime="2026-08-10">{article.date}</time>
+                    <time dateTime={article.dateTime}>{article.date}</time>
                   </div>
                   <h2>{article.title}</h2>
                   <p>{article.description}</p>
