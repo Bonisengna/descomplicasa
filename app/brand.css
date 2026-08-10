@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap');
+
+.brand-wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1px;
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.brand-descompli {
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
+  letter-spacing: -.045em;
+  color: var(--graphite);
+}
+
+.brand-caza {
+  margin-left: 2px;
+  font-family: "DM Serif Display", Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -.02em;
+  color: var(--green);
+}
+
+.brand-inline,
+.footer-brand {
+  gap: 0;
+  font-size: 0;
+  letter-spacing: 0;
+}
+
+.brand-inline .brand-dot,
+.footer-brand .brand-dot {
+  margin-right: 10px;
+}
+
+.brand-inline::before,
+.footer-brand::before {
+  content: "Descompli";
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
+  letter-spacing: -.04em;
+}
+
+.brand-inline::after,
+.footer-brand::after {
+  content: "CAZA";
+  margin-left: 2px;
+  font-family: "DM Serif Display", Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -.02em;
+}
+
+.brand-inline::before {
+  color: #ffffff;
+  font-size: 12px;
+}
+
+.brand-inline::after {
+  color: #A8E5B9;
+  font-size: 13px;
+}
+
+.footer-brand::before {
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.footer-brand::after {
+  color: #86D89D;
+  font-size: 15px;
+}
+
+.footer p {
+  font-size: 0;
+}
+
+.footer p::before {
+  content: "© 2026 DescompliCAZA.";
+  font-size: 11px;
+}
+
+@media (max-width: 520px) {
+  .brand-wordmark {
+    font-size: 19px;
+  }
+}

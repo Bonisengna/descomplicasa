@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./brand.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Descomplicasa | Entenda antes de comprar um imóvel",
-    template: "%s | Descomplicasa",
+    default: "DescompliCAZA | Entenda antes de comprar um imóvel",
+    template: "%s | DescompliCAZA",
   },
   description:
     "Calculadoras, checklists e guias para entender custos, documentos e etapas antes de comprar um imóvel.",
@@ -17,12 +18,12 @@ export const metadata: Metadata = {
     "checklist compra imóvel",
   ],
   openGraph: {
-    title: "Descomplicasa | Entenda antes de comprar um imóvel",
+    title: "DescompliCAZA | Entenda antes de comprar um imóvel",
     description:
       "Calcule custos, confira documentos e entenda cada etapa da compra do imóvel.",
     type: "website",
     locale: "pt_BR",
-    siteName: "Descomplicasa",
+    siteName: "DescompliCAZA",
   },
   robots: {
     index: true,
