@@ -1,0 +1,124 @@
+.section {
+  padding: 78px 0;
+  border-top: 1px solid var(--border);
+  background: white;
+}
+
+.heading {
+  margin-bottom: 28px;
+}
+
+.heading h2 {
+  margin: 8px 0 8px;
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(31px, 4vw, 42px);
+  line-height: 1.05;
+  letter-spacing: -.045em;
+}
+
+.heading p {
+  max-width: 780px;
+  margin: 0;
+  color: var(--gray);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.kicker {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+
+.card {
+  min-height: 255px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #fbfdfb;
+}
+
+.bankMark {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--green-soft);
+  color: var(--green-dark);
+  font-family: "Manrope", sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.cardBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.card h3 {
+  margin: 0;
+  font-family: "Manrope", sans-serif;
+  font-size: 17px;
+  letter-spacing: -.03em;
+}
+
+.card p {
+  margin: 9px 0 18px;
+  color: var(--gray);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.card a {
+  margin-top: auto;
+  color: var(--green-dark);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.card a:hover {
+  color: var(--green);
+}
+
+.disclaimer {
+  margin: 18px 0 0;
+  padding: 15px 17px;
+  border-radius: 12px;
+  background: var(--green-soft);
+  color: #435048;
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+@media (max-width: 1050px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .section {
+    padding: 62px 0;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    min-height: auto;
+  }
+}
