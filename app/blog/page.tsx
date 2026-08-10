@@ -3,7 +3,7 @@ import { Header } from "@/components/Header";
 import styles from "./blog.module.css";
 
 export const metadata: Metadata = {
-  title: "Blog | Descomplicasa",
+  title: "Blog | DescompliCAZA",
   description:
     "Conteúdo prático sobre financiamento, compra de imóveis, Minha Casa Minha Vida, documentos e planejamento financeiro.",
 };
@@ -38,7 +38,7 @@ export default function BlogPage() {
 
       <section className={styles.hero}>
         <div className="container">
-          <span className={styles.kicker}>Blog Descomplicasa</span>
+          <span className={styles.kicker}>Blog DescompliCAZA</span>
           <h1>Comprar melhor começa por entender melhor.</h1>
           <p>Dados, explicações e decisões práticas para quem está planejando comprar um imóvel.</p>
         </div>
@@ -80,7 +80,7 @@ export default function BlogPage() {
         <div className={`container ${styles.toolsInner}`}>
           <div>
             <span className={styles.kicker}>Não fique só na teoria</span>
-            <h2>Use as ferramentas do Descomplicasa.</h2>
+            <h2>Use as ferramentas do DescompliCAZA.</h2>
           </div>
           <div className={styles.toolLinks}>
             <a href="/calculadoras/financiamento">Calculadora de financiamento →</a>
@@ -92,8 +92,8 @@ export default function BlogPage() {
 
       <footer className="footer">
         <div className="container footer-inner">
-          <a className="footer-brand" href="/"><span className="brand-dot" /> DESCOMPLICASA</a>
-          <p>© 2026 Descomplicasa.</p>
+          <a className="footer-brand" href="/"><span className="brand-dot" /> DescompliCAZA</a>
+          <p>© 2026 DescompliCAZA.</p>
         </div>
       </footer>
     </main>
