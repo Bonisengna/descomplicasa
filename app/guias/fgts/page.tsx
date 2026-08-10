@@ -131,7 +131,7 @@ export default function FgtsGuidePage() {
 
             <div className={styles.heroActions}>
               <a className="button" href="https://play.google.com/store/apps/details?id=br.gov.caixa.fgts.trabalhador" target="_blank" rel="noopener noreferrer">Abrir Google Play</a>
-              <a className={styles.secondaryLink} href="https://apps.apple.com/br/app/fgts/id1038441027" target="_blank" rel="noopener noreferrer">Abrir App Store</a>
+              <a className="button" href="https://apps.apple.com/br/app/fgts/id1038441027" target="_blank" rel="noopener noreferrer">Abrir App Store</a>
             </div>
           </section>
 
