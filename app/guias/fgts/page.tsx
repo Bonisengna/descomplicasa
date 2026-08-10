@@ -62,10 +62,6 @@ export default function FgtsGuidePage() {
               <span className={styles.kicker}>Guia prático</span>
               <h1>FGTS na compra do imóvel</h1>
               <p>Consulte o saldo, confira se ele está livre, autorize o banco e entenda as regras antes de contar com o FGTS na entrada.</p>
-              <div className={styles.heroActions}>
-                <a className="button" href="https://play.google.com/store/apps/details?id=br.gov.caixa.fgts.trabalhador" target="_blank" rel="noopener noreferrer">Baixar no Android ↗</a>
-                <a className={styles.secondaryLink} href="https://apps.apple.com/br/app/fgts/id1038441027" target="_blank" rel="noopener noreferrer">Baixar no iPhone ↗</a>
-              </div>
             </div>
 
             <aside className={styles.updateCard}>
@@ -130,12 +126,12 @@ export default function FgtsGuidePage() {
             <div className={styles.limitGrid}>
               <div><span>Android</span><strong>Google Play</strong><small>Aplicativo FGTS — Caixa Econômica Federal</small></div>
               <div><span>iPhone</span><strong>App Store</strong><small>Aplicativo FGTS — Caixa Econômica Federal</small></div>
-              <div><span>Preço</span><strong>Gratuito</strong><small>baixe apenas pelas lojas oficiais</small></div>
+              <div><span>Preço</span><strong>Gratuito</strong><small>Baixe apenas pelas lojas oficiais</small></div>
             </div>
 
             <div className={styles.heroActions}>
-              <a className="button" href="https://play.google.com/store/apps/details?id=br.gov.caixa.fgts.trabalhador" target="_blank" rel="noopener noreferrer">Abrir Google Play ↗</a>
-              <a className={styles.secondaryLink} href="https://apps.apple.com/br/app/fgts/id1038441027" target="_blank" rel="noopener noreferrer">Abrir App Store ↗</a>
+              <a className="button" href="https://play.google.com/store/apps/details?id=br.gov.caixa.fgts.trabalhador" target="_blank" rel="noopener noreferrer">Abrir Google Play</a>
+              <a className={styles.secondaryLink} href="https://apps.apple.com/br/app/fgts/id1038441027" target="_blank" rel="noopener noreferrer">Abrir App Store</a>
             </div>
           </section>
 
@@ -218,7 +214,7 @@ export default function FgtsGuidePage() {
                 <h2>Descubra sua faixa e simule a compra.</h2>
                 <p>Depois de conferir o FGTS, veja seu enquadramento no Minha Casa Minha Vida e teste entrada, prazo e financiamento.</p>
               </div>
-              <a className="button" href="/calculadoras/faixa-minha-casa-minha-vida">Descobrir minha faixa →</a>
+              <a className="button" href="/calculadoras/faixa-minha-casa-minha-vida">Descobrir minha faixa</a>
             </section>
           </section>
 
@@ -239,10 +235,10 @@ export default function FgtsGuidePage() {
             <h2>Fontes oficiais</h2>
             <p>Regras revisadas com base no Portal FGTS e na CAIXA. Como as normas podem mudar, confirme a situação no momento da operação.</p>
             <div>
-              <a href="https://www.fgts.gov.br/Paginas/trabalhador/fgts-na-moradia.aspx" target="_blank" rel="noopener noreferrer">FGTS na Moradia Própria ↗</a>
-              <a href="https://www.fgts.gov.br/Paginas/trabalhador/saque/saque-aniversario.aspx" target="_blank" rel="noopener noreferrer">Regras do Saque-Aniversário ↗</a>
-              <a href="https://www.caixa.gov.br/atendimento/aplicativos/fgts/Paginas/default.aspx" target="_blank" rel="noopener noreferrer">Aplicativo FGTS — CAIXA ↗</a>
-              <a href="https://www.caixa.gov.br/voce/credito-financiamento/emprestimo/antecipacao-saque-aniversario-FGTS/perguntas-frequentes/Paginas/default.aspx" target="_blank" rel="noopener noreferrer">Antecipação — perguntas frequentes ↗</a>
+              <a href="https://www.fgts.gov.br/Paginas/trabalhador/fgts-na-moradia.aspx" target="_blank" rel="noopener noreferrer">FGTS na Moradia Própria</a>
+              <a href="https://www.fgts.gov.br/Paginas/trabalhador/saque/saque-aniversario.aspx" target="_blank" rel="noopener noreferrer">Regras do Saque-Aniversário</a>
+              <a href="https://www.caixa.gov.br/atendimento/aplicativos/fgts/Paginas/default.aspx" target="_blank" rel="noopener noreferrer">Aplicativo FGTS — CAIXA</a>
+              <a href="https://www.caixa.gov.br/voce/credito-financiamento/emprestimo/antecipacao-saque-aniversario-FGTS/perguntas-frequentes/Paginas/default.aspx" target="_blank" rel="noopener noreferrer">Antecipação — perguntas frequentes</a>
             </div>
           </section>
         </article>
