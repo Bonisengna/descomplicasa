@@ -1,15 +1,27 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "./financiamento.module.css";
+import tableStyles from "./amortization-table.module.css";
 
 type SystemType = "sac" | "price";
+
+type ScheduleRow = {
+  month: number;
+  openingBalance: number;
+  interest: number;
+  amortization: number;
+  payment: number;
+  closingBalance: number;
+};
 
 const money = new Intl.NumberFormat("pt-BR", {
   style: "currency",
   currency: "BRL",
   maximumFractionDigits: 2,
 });
+
+const rowsPerPage = 12;
 
 function clampNumber(value: number, min: number, max: number) {
   if (Number.isNaN(value)) return min;
@@ -22,6 +34,7 @@ export function FinancingCalculator() {
   const [years, setYears] = useState(30);
   const [annualRate, setAnnualRate] = useState(10);
   const [system, setSystem] = useState<SystemType>("sac");
+  const [schedulePage, setSchedulePage] = useState(0);
 
   const result = useMemo(() => {
     const value = Math.max(propertyValue, 0);
@@ -31,8 +44,12 @@ export function FinancingCalculator() {
     const annual = Math.max(annualRate, 0) / 100;
     const monthlyRate = annual === 0 ? 0 : Math.pow(1 + annual, 1 / 12) - 1;
 
+    const schedule: ScheduleRow[] = [];
+
     if (principal <= 0) {
       return {
+        value,
+        entry,
         principal,
         months,
         monthlyRate,
@@ -42,6 +59,7 @@ export function FinancingCalculator() {
         totalPaid: 0,
         entryPercent: value > 0 ? (entry / value) * 100 : 0,
         financedPercent: 0,
+        schedule,
       };
     }
 
@@ -50,40 +68,92 @@ export function FinancingCalculator() {
         monthlyRate === 0
           ? principal / months
           : (principal * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
-      const totalPaid = payment * months;
+
+      let balance = principal;
+      let totalInterest = 0;
+
+      for (let month = 1; month <= months; month += 1) {
+        const openingBalance = balance;
+        const interest = openingBalance * monthlyRate;
+        const amortization = month === months ? openingBalance : Math.min(payment - interest, openingBalance);
+        const actualPayment = interest + amortization;
+        balance = Math.max(openingBalance - amortization, 0);
+        totalInterest += interest;
+
+        schedule.push({
+          month,
+          openingBalance,
+          interest,
+          amortization,
+          payment: actualPayment,
+          closingBalance: balance,
+        });
+      }
 
       return {
+        value,
+        entry,
         principal,
         months,
         monthlyRate,
-        firstPayment: payment,
-        lastPayment: payment,
-        totalInterest: totalPaid - principal,
-        totalPaid,
+        firstPayment: schedule[0]?.payment ?? 0,
+        lastPayment: schedule.at(-1)?.payment ?? 0,
+        totalInterest,
+        totalPaid: principal + totalInterest,
         entryPercent: value > 0 ? (entry / value) * 100 : 0,
         financedPercent: value > 0 ? (principal / value) * 100 : 0,
+        schedule,
       };
     }
 
-    const amortization = principal / months;
-    const firstPayment = amortization + principal * monthlyRate;
-    const lastPayment = amortization + amortization * monthlyRate;
-    const totalInterest = monthlyRate * principal * ((months + 1) / 2);
+    const constantAmortization = principal / months;
+    let balance = principal;
+    let totalInterest = 0;
+
+    for (let month = 1; month <= months; month += 1) {
+      const openingBalance = balance;
+      const interest = openingBalance * monthlyRate;
+      const amortization = month === months ? openingBalance : Math.min(constantAmortization, openingBalance);
+      const payment = amortization + interest;
+      balance = Math.max(openingBalance - amortization, 0);
+      totalInterest += interest;
+
+      schedule.push({
+        month,
+        openingBalance,
+        interest,
+        amortization,
+        payment,
+        closingBalance: balance,
+      });
+    }
 
     return {
+      value,
+      entry,
       principal,
       months,
       monthlyRate,
-      firstPayment,
-      lastPayment,
+      firstPayment: schedule[0]?.payment ?? 0,
+      lastPayment: schedule.at(-1)?.payment ?? 0,
       totalInterest,
       totalPaid: principal + totalInterest,
       entryPercent: value > 0 ? (entry / value) * 100 : 0,
       financedPercent: value > 0 ? (principal / value) * 100 : 0,
+      schedule,
     };
   }, [propertyValue, downPayment, years, annualRate, system]);
 
-  const invalidEntry = downPayment > propertyValue;
+  useEffect(() => {
+    setSchedulePage(0);
+  }, [propertyValue, downPayment, years, annualRate, system]);
+
+  const invalidEntry = downPayment > propertyValue || downPayment < 0;
+  const pageCount = Math.max(Math.ceil(result.schedule.length / rowsPerPage), 1);
+  const safePage = Math.min(schedulePage, pageCount - 1);
+  const firstVisibleMonth = safePage * rowsPerPage + 1;
+  const lastVisibleMonth = Math.min((safePage + 1) * rowsPerPage, result.schedule.length);
+  const visibleRows = result.schedule.slice(safePage * rowsPerPage, (safePage + 1) * rowsPerPage);
 
   return (
     <section className={styles.calculatorSection}>
@@ -124,7 +194,7 @@ export function FinancingCalculator() {
                   aria-invalid={invalidEntry}
                 />
               </div>
-              {invalidEntry && <small>A entrada não pode ser maior que o valor do imóvel.</small>}
+              {invalidEntry && <small>A entrada deve ficar entre R$ 0 e o valor do imóvel.</small>}
             </label>
 
             <label className={styles.field}>
@@ -232,7 +302,7 @@ export function FinancingCalculator() {
               <span style={{ width: `${Math.min(result.entryPercent, 100)}%` }} />
             </div>
             <div className={styles.compositionLegend}>
-              <span>Entrada: {money.format(Math.min(downPayment, propertyValue))}</span>
+              <span>Entrada: {money.format(result.entry)}</span>
               <span>Financiado: {result.financedPercent.toFixed(0)}%</span>
             </div>
           </div>
@@ -241,6 +311,86 @@ export function FinancingCalculator() {
             A taxa anual é convertida para uma taxa mensal equivalente para esta estimativa. O resultado não considera CET, seguros, TR, tarifas e outros custos do contrato.
           </p>
         </aside>
+      </div>
+
+      <div className={`container ${tableStyles.scheduleSection}`}>
+        <div className={tableStyles.heading}>
+          <div>
+            <span className={tableStyles.kicker}>Evolução do financiamento</span>
+            <h2>Tabela mês a mês</h2>
+            <p>
+              Veja quanto de cada prestação corresponde a juros e amortização, e como o saldo devedor diminui ao longo do contrato.
+            </p>
+          </div>
+          <div className={tableStyles.systemBadge}>{system.toUpperCase()}</div>
+        </div>
+
+        {result.schedule.length > 0 ? (
+          <div className={tableStyles.tableCard}>
+            <div className={tableStyles.tableMeta}>
+              <div>
+                <strong>Meses {firstVisibleMonth}–{lastVisibleMonth}</strong>
+                <span>de {result.months} meses</span>
+              </div>
+              <span>Página {safePage + 1} de {pageCount}</span>
+            </div>
+
+            <div className={tableStyles.tableScroll}>
+              <table className={tableStyles.table}>
+                <caption className={tableStyles.srOnly}>
+                  Evolução mensal do saldo devedor no sistema {system.toUpperCase()}
+                </caption>
+                <thead>
+                  <tr>
+                    <th>Mês</th>
+                    <th>Saldo inicial</th>
+                    <th>Juros</th>
+                    <th>Amortização</th>
+                    <th>Prestação</th>
+                    <th>Saldo final</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {visibleRows.map((row) => (
+                    <tr key={row.month}>
+                      <td><strong>{row.month}</strong></td>
+                      <td>{money.format(row.openingBalance)}</td>
+                      <td>{money.format(row.interest)}</td>
+                      <td>{money.format(row.amortization)}</td>
+                      <td>{money.format(row.payment)}</td>
+                      <td>{money.format(row.closingBalance)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className={tableStyles.pagination}>
+              <button
+                type="button"
+                disabled={safePage === 0}
+                onClick={() => setSchedulePage((page) => Math.max(page - 1, 0))}
+              >
+                ← 12 meses anteriores
+              </button>
+              <button
+                type="button"
+                disabled={safePage >= pageCount - 1}
+                onClick={() => setSchedulePage((page) => Math.min(page + 1, pageCount - 1))}
+              >
+                Próximos 12 meses →
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className={tableStyles.emptyState}>
+            Informe um valor de imóvel maior que a entrada para visualizar a evolução mensal.
+          </div>
+        )}
+
+        <p className={tableStyles.note}>
+          A tabela usa somente o principal e a taxa informada. Em um contrato real, TR, seguros, tarifas, CET e outros encargos podem alterar parcelas e saldo devedor.
+        </p>
       </div>
     </section>
   );
