@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { FinancingCalculator } from "./FinancingCalculator";
+import { BankSimulators } from "./BankSimulators";
 import styles from "./financiamento.module.css";
 
 export const metadata: Metadata = {
   title: "Calculadora de Financiamento Imobiliário | Descomplicasa",
   description:
-    "Simule um financiamento imobiliário com entrada, prazo, taxa de juros e sistemas SAC ou Price. Veja parcelas e custo total estimados.",
+    "Simule um financiamento imobiliário com entrada, prazo, taxa de juros e sistemas SAC ou Price. Veja parcelas, saldo devedor mês a mês e custo total estimados.",
 };
 
 export default function FinancingPage() {
@@ -29,7 +30,7 @@ export default function FinancingPage() {
               <span className={styles.kicker}>Calculadora gratuita</span>
               <h1>Simule seu financiamento imobiliário.</h1>
               <p>
-                Informe o valor do imóvel, a entrada, o prazo e a taxa de juros para ter uma estimativa das parcelas e do custo do financiamento.
+                Informe o valor do imóvel, a entrada, o prazo e a taxa de juros para ter uma estimativa das parcelas, dos juros e da evolução do saldo devedor.
               </p>
             </div>
 
@@ -44,6 +45,8 @@ export default function FinancingPage() {
       </section>
 
       <FinancingCalculator />
+
+      <BankSimulators />
 
       <section className={styles.explainer}>
         <div className="container">
