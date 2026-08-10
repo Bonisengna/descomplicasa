@@ -10,10 +10,12 @@ export function Header() {
   return (
     <header className="site-header">
       <div className="container header-inner">
-        <a className="brand" href="/" aria-label="Descomplicasa - início" onClick={close}>
+        <a className="brand" href="/" aria-label="DescompliCAZA - início" onClick={close}>
           <span className="brand-dot" aria-hidden="true" />
           <span className="brand-copy">
-            <strong>DESCOMPLICASA</strong>
+            <strong className="brand-wordmark" aria-label="DescompliCAZA">
+              <span className="brand-descompli">Descompli</span><span className="brand-caza">CAZA</span>
+            </strong>
             <small>Tudo o que você precisa entender antes de comprar um imóvel.</small>
           </span>
         </a>
@@ -37,7 +39,7 @@ export function Header() {
           <a href="/#guias" onClick={close}>Guias</a>
           <a href="/blog" onClick={close}>Blog</a>
           <a href="/#sobre" onClick={close}>Sobre</a>
-          <a className="button button-small" href="/calculadoras/financiamento" onClick={close}>Simular financiamento <span aria-hidden="true">→</span></a>
+          <a className="button button-small" href="/calculadoras/financiamento" onClick={close}>Simular financiamento</a>
         </nav>
       </div>
     </header>
