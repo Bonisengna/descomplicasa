@@ -10,6 +10,16 @@ export const metadata: Metadata = {
 
 const articles = [
   {
+    category: "Planejamento",
+    date: "10 de agosto de 2026",
+    dateTime: "2026-08-10",
+    title: "Como juntar dinheiro para a entrada de um imóvel: um plano prático",
+    description:
+      "Descubra quanto falta, transforme a diferença em uma meta mensal e organize recursos próprios, FGTS e custos da compra sem perder o controle do orçamento.",
+    href: "/guias/como-juntar-entrada-imovel",
+    featured: true,
+  },
+  {
     category: "Financiamento",
     date: "10 de agosto de 2026",
     dateTime: "2026-08-10",
@@ -17,7 +27,7 @@ const articles = [
     description:
       "Entenda por que bancos usam a renda bruta, onde esse critério faz sentido e por que ele não basta para saber se a prestação realmente cabe no orçamento.",
     href: "/guias/renda-bruta-financiamento-imobiliario",
-    featured: true,
+    featured: false,
   },
   {
     category: "Financiamento",
@@ -68,7 +78,7 @@ export default function BlogPage() {
                   </div>
                   <h2>{article.title}</h2>
                   <p>{article.description}</p>
-                  <a href={article.href}>Ler artigo →</a>
+                  <a href={article.href}>Ler artigo</a>
                 </div>
               </article>
             ))}
@@ -83,9 +93,10 @@ export default function BlogPage() {
             <h2>Use as ferramentas do DescompliCAZA.</h2>
           </div>
           <div className={styles.toolLinks}>
-            <a href="/calculadoras/financiamento">Calculadora de financiamento →</a>
-            <a href="/calculadoras/faixa-minha-casa-minha-vida">Descobrir faixa MCMV →</a>
-            <a href="/checklists/documentos-mcmv">Checklist de documentos MCMV →</a>
+            <a href="/calculadoras/entrada">Calculadora de entrada</a>
+            <a href="/calculadoras/financiamento">Calculadora de financiamento</a>
+            <a href="/calculadoras/faixa-minha-casa-minha-vida">Descobrir faixa MCMV</a>
+            <a href="/checklists/documentos-mcmv">Checklist de documentos MCMV</a>
           </div>
         </div>
       </section>

@@ -29,7 +29,7 @@ export function EntryCalculator() {
   const [ownResources, setOwnResources] = useState(formatMoneyInput(20000));
   const [fgts, setFgts] = useState(formatMoneyInput(15000));
   const [subsidy, setSubsidy] = useState(formatMoneyInput(30000));
-  const [estimatedFinancing, setEstimatedFinancing] = useState(formatMoneyInput(235000));
+  const [estimatedFinancing, setEstimatedFinancing] = useState("");
 
   const result = useMemo(() => {
     const property = moneyValue(propertyValue);
@@ -64,6 +64,9 @@ export function EntryCalculator() {
 
   const hasProperty = result.property > 0;
   const covered = hasProperty && result.missing === 0;
+  const monthly12 = result.missing / 12;
+  const monthly24 = result.missing / 24;
+  const monthly36 = result.missing / 36;
 
   return (
     <section className={styles.calculatorSection} aria-labelledby="entry-calculator-title">
@@ -121,15 +124,25 @@ export function EntryCalculator() {
                 <small>Se não houver subsídio, informe zero.</small>
               </label>
 
+              <div className={`${styles.financingPrompt} ${styles.fullField}`}>
+                <div>
+                  <span>Financiamento</span>
+                  <strong>Já tem um valor aprovado?</strong>
+                  <p>Informe abaixo o valor aprovado ou o valor estimado que pretende financiar.</p>
+                </div>
+                <a href="/calculadoras/financiamento">Ainda não sabe? Simule um cenário</a>
+              </div>
+
               <label className={`${styles.field} ${styles.fullField}`}>
-                <span>Financiamento estimado</span>
+                <span>Financiamento aprovado ou estimado</span>
                 <input
                   inputMode="numeric"
                   value={estimatedFinancing}
+                  placeholder="Ex.: R$ 235.000"
                   onChange={(event) => setEstimatedFinancing(normalizeMoneyInput(event.target.value))}
-                  aria-label="Financiamento estimado"
+                  aria-label="Financiamento aprovado ou estimado"
                 />
-                <small>Use o valor que você acredita que o banco poderá financiar. A aprovação real pode ser diferente.</small>
+                <small>Se você ainda não passou por análise bancária, trate este valor apenas como uma hipótese de planejamento.</small>
               </label>
             </div>
 
@@ -137,6 +150,13 @@ export function EntryCalculator() {
               <a href="/guias/fgts">Entender como usar o FGTS</a>
               <a href="/calculadoras/faixa-minha-casa-minha-vida">Ver minha faixa MCMV</a>
             </div>
+
+            <article className={styles.tipsCard}>
+              <span>Como juntar a entrada</span>
+              <h3>Transforme o valor que falta em uma meta mensal.</h3>
+              <p>Defina um prazo, automatize a separação do dinheiro e acompanhe a meta sem esquecer dos custos da compra e da sua reserva para imprevistos.</p>
+              <a href="/guias/como-juntar-entrada-imovel">Ver dicas para juntar a entrada</a>
+            </article>
           </div>
 
           <aside className={styles.resultCard} aria-live="polite">
@@ -194,6 +214,18 @@ export function EntryCalculator() {
                 <dd>{brl.format(result.totalAvailable)}</dd>
               </div>
             </dl>
+
+            {!covered && hasProperty && result.missing > 0 ? (
+              <div className={styles.savingsPlan}>
+                <span>Plano para fechar a diferença</span>
+                <p>Quanto precisaria separar por mês, sem considerar rendimentos:</p>
+                <div className={styles.savingsGrid}>
+                  <div><small>12 meses</small><strong>{brl.format(monthly12)}/mês</strong></div>
+                  <div><small>24 meses</small><strong>{brl.format(monthly24)}/mês</strong></div>
+                  <div><small>36 meses</small><strong>{brl.format(monthly36)}/mês</strong></div>
+                </div>
+              </div>
+            ) : null}
 
             <div className={styles.breakdown}>
               <span>Composição da entrada</span>
