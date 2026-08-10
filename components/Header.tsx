@@ -35,6 +35,7 @@ export function Header() {
           <a href="/#calculadoras" onClick={close}>Calculadoras</a>
           <a href="/#checklists" onClick={close}>Checklists</a>
           <a href="/#guias" onClick={close}>Guias</a>
+          <a href="/blog" onClick={close}>Blog</a>
           <a href="/#sobre" onClick={close}>Sobre</a>
           <a className="button button-small" href="/calculadoras/financiamento" onClick={close}>Simular financiamento <span aria-hidden="true">→</span></a>
         </nav>
