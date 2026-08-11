@@ -6,7 +6,7 @@ import styles from "./amortizacao.module.css";
 export const metadata: Metadata = {
   title: "Simulador de amortização de financiamento | DescompliCAZA",
   description:
-    "Simule um aporte único no financiamento imobiliário e veja a redução estimada de prazo, parcela e juros nos sistemas SAC e Price.",
+    "Simule aporte imediato, aporte anual e uso periódico do FGTS no financiamento imobiliário e veja a redução estimada de prazo, parcela e juros.",
 };
 
 const structuredData = {
@@ -17,7 +17,7 @@ const structuredData = {
   operatingSystem: "Web",
   offers: { "@type": "Offer", price: "0", priceCurrency: "BRL" },
   description:
-    "Ferramenta gratuita para comparar um financiamento antes e depois de um aporte extraordinário.",
+    "Ferramenta gratuita para comparar um financiamento antes e depois de aportes extraordinários e recorrentes.",
 };
 
 export default function AmortizationPage() {
@@ -34,16 +34,16 @@ export default function AmortizationPage() {
           <div className={styles.heroGrid}>
             <div>
               <span className={styles.kicker}>Simulador gratuito</span>
-              <h1>Veja quanto um aporte pode encurtar seu financiamento.</h1>
+              <h1>Veja quanto seus aportes podem encurtar o financiamento.</h1>
               <p>
-                Informe o saldo devedor, o prazo e a taxa. Depois mova a barra de aporte para comparar o contrato atual com uma amortização extraordinária.
+                Informe o saldo devedor, o prazo e a taxa. Depois combine aporte hoje, aportes anuais e FGTS quando elegível para comparar diferentes estratégias de amortização.
               </p>
             </div>
 
             <aside className={styles.heroNote}>
-              <strong>Aporte único, SAC ou Price.</strong>
+              <strong>Aporte único, anual e FGTS na mesma simulação.</strong>
               <p>
-                Você pode simular redução de prazo ou redução de parcela. A ferramenta usa um modelo matemático simplificado e não substitui o recálculo oficial do banco.
+                Compare redução de prazo ou de parcela nos sistemas SAC e Price. O resultado é uma estimativa matemática e não substitui o recálculo oficial do banco.
               </p>
             </aside>
           </div>
@@ -65,11 +65,11 @@ export default function AmortizationPage() {
             </article>
             <article>
               <h3>Reduzir parcela</h3>
-              <p>O prazo permanece igual e o saldo menor é redistribuído pelos meses restantes, reduzindo a prestação estimada.</p>
+              <p>O saldo menor é redistribuído pelo prazo restante, reduzindo a prestação estimada conforme os eventos de amortização acontecem.</p>
             </article>
             <article>
-              <h3>Economia de juros</h3>
-              <p>A economia exibida compara os juros futuros do cenário atual com os juros futuros do cenário após o aporte.</p>
+              <h3>FGTS não é aporte anual automático</h3>
+              <p>Na amortização ou liquidação, o simulador considera intervalo de 24 meses entre usos do FGTS. A elegibilidade e o saldo disponível precisam ser confirmados com a instituição financeira.</p>
             </article>
           </div>
         </div>
@@ -77,7 +77,7 @@ export default function AmortizationPage() {
 
       <section className={styles.disclaimer}>
         <div className="container">
-          Esta ferramenta é informativa. O cálculo não considera TR, seguros, tarifas, CET, datas exatas de vencimento, atualização monetária ou regras específicas de recálculo da instituição financeira. Consulte o banco antes de efetuar uma amortização.
+          Esta ferramenta é informativa. O cálculo não considera TR, seguros, tarifas, CET, datas exatas de vencimento, atualização monetária ou regras específicas de recálculo da instituição financeira. O uso do FGTS depende das regras vigentes, do contrato e da elegibilidade do trabalhador. Consulte o banco antes de efetuar uma amortização.
         </div>
       </section>
 
