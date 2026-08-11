@@ -33,7 +33,7 @@
 
 .brand-inline .brand-dot,
 .footer-brand .brand-dot {
-  margin-right: 10px;
+  display: none;
 }
 
 .brand-inline::before,
