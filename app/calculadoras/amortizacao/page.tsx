@@ -41,7 +41,6 @@ export default function AmortizationPage() {
             </div>
 
             <aside className={styles.heroNote}>
-              <span>Versão 1</span>
               <strong>Aporte único, SAC ou Price.</strong>
               <p>
                 Você pode simular redução de prazo ou redução de parcela. A ferramenta usa um modelo matemático simplificado e não substitui o recálculo oficial do banco.
