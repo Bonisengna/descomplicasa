@@ -15,7 +15,8 @@ Este arquivo deve permanecer como contexto do produto até a V6.
 - Informar que TR, seguros, tarifas, CET, atualização monetária, datas e regras específicas da instituição podem alterar o resultado real.
 - SAC e Price permanecem separados.
 - FGTS entra como estratégia dentro desta calculadora; não criar calculadora de amortização exclusiva para FGTS.
-- Não assumir que todo saldo de FGTS está disponível ou que pode ser usado em qualquer periodicidade; sempre direcionar para as regras vigentes.
+- Não assumir que todo saldo de FGTS está disponível.
+- Para amortização ou liquidação, usar no modelo atual intervalo mínimo de 24 meses entre utilizações do FGTS e deixar claro que a elegibilidade precisa ser confirmada.
 
 ## Modelo matemático base
 Taxa mensal equivalente: `i_m = (1 + i_a)^(1/12) - 1`.
@@ -31,22 +32,31 @@ Status: IMPLEMENTADA
 
 Inclui saldo devedor, prazo, taxa anual, SAC/Price, aporte único com slider, redução de prazo/parcela, novo saldo, novo prazo, juros economizados e tabela mês a mês.
 
-## Incremento atual — aporte anual dentro da mesma ferramenta
+## Incremento atual — aportes recorrentes dentro da mesma ferramenta
 Status: IMPLEMENTADO
 
-Decisão de produto: antecipamos parte da V3 por ser um caso de uso forte e manter a ferramenta concentrada em uma única página.
+Decisão de produto: antecipamos partes da V3 e V4 porque o caso de uso é forte e queremos concentrar toda a amortização em uma única página.
 
+### Aporte anual com recursos próprios
 Inclui:
-- ativação opcional de aporte anual;
+- ativação opcional;
 - valor anual;
 - primeiro mês do aporte;
 - repetição a cada 12 meses enquanto houver saldo;
-- exemplos de origem: FGTS, 13º, bônus ou reserva;
-- total de aportes anuais efetivamente aplicados;
-- coluna de aporte anual na tabela mês a mês;
-- link contextual para `/guias/fgts`.
+- uso para representar 13º, bônus, PLR ou reserva própria;
+- total efetivamente aplicado;
+- coluna própria na tabela mês a mês.
 
-Importante: o rótulo FGTS é apenas um exemplo de origem do recurso. A calculadora não afirma elegibilidade nem disponibilidade do saldo.
+### FGTS periódico
+Inclui:
+- ativação opcional;
+- valor estimado por utilização;
+- primeiro mês de uso;
+- repetição a cada 24 meses no modelo de amortização/liquidação;
+- total de FGTS aplicado no cenário;
+- coluna própria na tabela mês a mês;
+- link contextual para `/guias/fgts`;
+- aviso de que saldo, elegibilidade e regras do contrato precisam ser confirmados.
 
 ## V2 — Aporte mensal recorrente
 Status: PLANEJADA
@@ -65,16 +75,24 @@ Falta:
 - linha do tempo visual dos eventos.
 
 ## V4 — FGTS como estratégia de amortização
-Status: PLANEJADA
+Status: PARCIALMENTE IMPLEMENTADA
 
-Adicionar:
-- saldo FGTS disponível informado pelo usuário;
-- cenários compatíveis com as modalidades permitidas pelas regras vigentes;
-- alerta para saldo bloqueado por antecipação do Saque-Aniversário;
-- conexão forte com `/guias/fgts`;
-- elegibilidade e disponibilidade sempre sujeitas a confirmação.
+Já implementado:
+- valor de FGTS informado pelo usuário;
+- primeiro mês de utilização;
+- intervalo de referência de 24 meses entre amortizações/liquidações;
+- total aplicado;
+- visualização dos eventos na tabela;
+- conexão com `/guias/fgts`;
+- aviso de elegibilidade.
 
-Não criar página/calculadora separada: será uma área da calculadora de amortização.
+Falta:
+- saldo inicial de FGTS separado do valor por uso;
+- projeção opcional de novos depósitos;
+- alerta específico para saldo bloqueado por antecipação do Saque-Aniversário;
+- modalidades distintas: amortização, liquidação e pagamento de parte das prestações.
+
+Não criar página/calculadora separada: o FGTS continuará como área da calculadora de amortização.
 
 ## V5 — Múltiplos aportes e plano personalizado
 Status: PLANEJADA
@@ -86,7 +104,7 @@ Status: PLANEJADA
 
 Pergunta principal: **Tenho R$ X disponíveis. Qual estratégia produz o melhor resultado para meu objetivo?**
 
-Adicionar comparação automática entre aporte hoje, mensal e anual; objetivo reduzir prazo/juros/parcela; ranking; melhor redução de prazo; maior economia de juros; flexibilidade; visualização consolidada.
+Adicionar comparação automática entre aporte hoje, mensal, anual e FGTS quando aplicável; objetivo reduzir prazo/juros/parcela; ranking; melhor redução de prazo; maior economia de juros; flexibilidade; visualização consolidada.
 
 ## Integrações previstas
 - `/calculadoras/financiamento`: levar saldo/taxa/prazo/sistema para amortização.
@@ -101,5 +119,8 @@ Adicionar comparação automática entre aporte hoje, mensal e anual; objetivo r
 4. redução de prazo nunca aumenta meses;
 5. economia de juros nunca negativa;
 6. aportes recorrentes param quando o saldo zera;
-7. interface móvel preserva controles principais;
-8. disclaimer permanece visível.
+7. aporte anual ocorre em intervalos de 12 meses a partir do mês escolhido;
+8. FGTS para amortização/liquidação ocorre em intervalos de 24 meses no modelo atual;
+9. interface móvel preserva controles principais;
+10. disclaimer permanece visível;
+11. o simulador nunca afirma que o usuário está elegível para usar FGTS.
