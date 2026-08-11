@@ -33,7 +33,7 @@ const guides = [
   { title: "Minha Casa Minha Vida", text: "Faixas de renda, subsídios, juros, FGTS e regras atualizadas para 2026.", className: "guide-financing", href: "/guias/minha-casa-minha-vida" },
   { title: "Financiamento", text: "Como funciona, o que influencia a aprovação e quais custos observar.", className: "guide-financing", href: "/guias/financiamento" },
   { title: "FGTS", text: "Como usar na compra, consultar saldo, liberar o banco e entender o Saque-Aniversário.", className: "guide-fgts", href: "/guias/fgts" },
-  { title: "ITBI", text: "O que é, quando é pago e por que o valor pode variar por município.", className: "guide-itbi" },
+  { title: "ITBI", text: "O que é, quando é pago e por que o valor pode variar por município.", className: "guide-itbi", href: "/guias/itbi" },
   { title: "Escritura", text: "Para que serve e em quais situações ela faz parte da compra.", className: "guide-deed" },
   { title: "Registro", text: "Por que registrar é essencial para formalizar a propriedade.", className: "guide-registry" },
 ];
@@ -142,7 +142,7 @@ export default function Home() {
         <div className="container">
           <div className="section-heading">
             <div><span className="kicker">Entenda como funciona</span><h2>Guias</h2><p>Conteúdo prático para entender termos, custos e decisões da compra.</p></div>
-            <span className="coming-link">3 guias já disponíveis</span>
+            <span className="coming-link">4 guias já disponíveis</span>
           </div>
           <div className="guides-grid">
             {guides.map((guide) => (
