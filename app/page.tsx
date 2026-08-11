@@ -15,6 +15,7 @@ import {
 
 const calculators = [
   { title: "Financiamento", text: "Descubra quanto pode financiar e tenha uma noção das parcelas.", Icon: CalculatorIcon, href: "/calculadoras/financiamento" },
+  { title: "Amortização", text: "Simule um aporte único e veja quanto pode reduzir em prazo, parcela e juros.", Icon: CalculatorIcon, href: "/calculadoras/amortizacao" },
   { title: "Faixa MCMV", text: "Descubra em qual faixa do Minha Casa Minha Vida sua renda familiar se enquadra.", Icon: HouseIcon, href: "/calculadoras/faixa-minha-casa-minha-vida" },
   { title: "Entrada", text: "Veja quanto precisa juntar e organize os recursos para a compra.", Icon: PiggyIcon, href: "/calculadoras/entrada" },
   { title: "ITBI", text: "Entenda o imposto envolvido na transferência do imóvel.", Icon: BankIcon },
@@ -98,7 +99,7 @@ export default function Home() {
         <div className="container">
           <div className="section-heading">
             <div><span className="kicker">Comece pelos números</span><h2>Calculadoras</h2><p>Entenda os principais custos e organize cada etapa da compra.</p></div>
-            <span className="coming-link">3 calculadoras já disponíveis</span>
+            <span className="coming-link">4 calculadoras já disponíveis</span>
           </div>
           <div className="calculator-grid">
             {calculators.map(({ title, text, Icon, href }) => (
@@ -162,21 +163,21 @@ export default function Home() {
       <section className="about-section" id="sobre">
         <div className="container about-grid">
           <div><span className="kicker">Por que existe</span><h2>Comprar um imóvel tem muita informação espalhada.</h2></div>
-          <div><p>O Descomplicasa nasce para reunir ferramentas e conteúdo em uma experiência simples: calcular, conferir e entender antes de decidir.</p><p className="about-disclaimer">O conteúdo tem caráter informativo e não substitui análise jurídica, registral, bancária ou técnica quando necessária.</p></div>
+          <div><p>O DescompliCAZA nasce para reunir ferramentas e conteúdo em uma experiência simples: calcular, conferir e entender antes de decidir.</p><p className="about-disclaimer">O conteúdo tem caráter informativo e não substitui análise jurídica, registral, bancária ou técnica quando necessária.</p></div>
         </div>
       </section>
 
       <section className="final-cta">
         <div className="container final-cta-inner">
-          <div><span className="brand-inline"><span className="brand-dot" /> DESCOMPLICASA</span><h2>Tudo o que você precisa entender antes de comprar um imóvel.</h2></div>
+          <div><span className="brand-inline"><span className="brand-dot" /> DescompliCAZA</span><h2>Tudo o que você precisa entender antes de comprar um imóvel.</h2></div>
           <a className="button button-light" href="/calculadoras/financiamento">Simular financiamento <ArrowIcon /></a>
         </div>
       </section>
 
       <footer className="footer">
         <div className="container footer-inner">
-          <a className="footer-brand" href="#top"><span className="brand-dot" /> DESCOMPLICASA</a>
-          <p>© 2026 Descomplicasa.</p>
+          <a className="footer-brand" href="#top"><span className="brand-dot" /> DescompliCAZA</a>
+          <p>© 2026 DescompliCAZA.</p>
         </div>
       </footer>
     </main>
