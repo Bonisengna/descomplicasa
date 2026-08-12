@@ -1,8 +1,41 @@
-/* Espaçamento visual consistente entre cards e blocos do site */
+/* Espaçamento visual consistente entre cards, blocos e topo das páginas */
 
 :root {
   --card-gap: 24px;
   --card-gap-mobile: 20px;
+}
+
+/* Header mais compacto sem prejudicar a navegação */
+.site-header .header-inner {
+  min-height: 80px !important;
+}
+
+/* Home: mantém presença de landing page, mas reduz o excesso vertical */
+main > section.hero:first-of-type {
+  padding-top: 58px !important;
+  padding-bottom: 56px !important;
+}
+
+/* Páginas internas: aproxima o conteúdo principal do header */
+main > section:first-of-type:not(.hero) {
+  padding-top: 34px !important;
+  padding-bottom: 42px !important;
+}
+
+/* Artigos do blog usam header dentro de article */
+main > article > header:first-child {
+  padding-top: 30px !important;
+  padding-bottom: 40px !important;
+}
+
+/* Breadcrumb não deve criar um segundo grande espaço antes do título */
+nav[aria-label="Navegação estrutural"] {
+  margin-bottom: 18px !important;
+}
+
+/* Hero interno: reduz distância lateral/vertical entre texto e card de apoio */
+[class*="heroGrid"] {
+  gap: 42px !important;
 }
 
 /* Home */
@@ -31,6 +64,29 @@
 }
 
 @media (max-width: 900px) {
+  .site-header .header-inner {
+    min-height: 74px !important;
+  }
+
+  main > section.hero:first-of-type {
+    padding-top: 42px !important;
+    padding-bottom: 44px !important;
+  }
+
+  main > section:first-of-type:not(.hero),
+  main > article > header:first-child {
+    padding-top: 26px !important;
+    padding-bottom: 34px !important;
+  }
+
+  nav[aria-label="Navegação estrutural"] {
+    margin-bottom: 15px !important;
+  }
+
+  [class*="heroGrid"] {
+    gap: 26px !important;
+  }
+
   .calculator-grid,
   .checklist-grid,
   .guides-grid,
@@ -48,4 +104,23 @@
 
 @media (max-width: 620px) {
   :root { --card-gap-mobile: 18px; }
+
+  .site-header .header-inner {
+    min-height: 68px !important;
+  }
+
+  main > section.hero:first-of-type {
+    padding-top: 32px !important;
+    padding-bottom: 36px !important;
+  }
+
+  main > section:first-of-type:not(.hero),
+  main > article > header:first-child {
+    padding-top: 20px !important;
+    padding-bottom: 30px !important;
+  }
+
+  nav[aria-label="Navegação estrutural"] {
+    margin-bottom: 12px !important;
+  }
 }
