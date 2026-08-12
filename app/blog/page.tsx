@@ -2,111 +2,13 @@ import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import styles from "./blog.module.css";
 
-export const metadata: Metadata = {
-  title: "Blog | DescompliCAZA",
-  description:
-    "Conteúdo prático sobre financiamento, compra de imóveis, Minha Casa Minha Vida, documentos e planejamento financeiro.",
-};
+export const metadata: Metadata = { title: "Blog | DescompliCAZA", description: "Conteúdo prático sobre financiamento, compra de imóveis, Minha Casa Minha Vida, documentos e planejamento financeiro." };
 
 const articles = [
-  {
-    category: "Planejamento",
-    date: "10 de agosto de 2026",
-    dateTime: "2026-08-10",
-    title: "Como juntar dinheiro para a entrada de um imóvel: um plano prático",
-    description:
-      "Descubra quanto falta, transforme a diferença em uma meta mensal e organize recursos próprios, FGTS e custos da compra sem perder o controle do orçamento.",
-    href: "/guias/como-juntar-entrada-imovel",
-    featured: true,
-  },
-  {
-    category: "Financiamento",
-    date: "10 de agosto de 2026",
-    dateTime: "2026-08-10",
-    title: "Por que é considerada a renda bruta no financiamento imobiliário? Isso é correto?",
-    description:
-      "Entenda por que bancos usam a renda bruta, onde esse critério faz sentido e por que ele não basta para saber se a prestação realmente cabe no orçamento.",
-    href: "/guias/renda-bruta-financiamento-imobiliario",
-    featured: false,
-  },
-  {
-    category: "Financiamento",
-    date: "10 de agosto de 2026",
-    dateTime: "2026-08-10",
-    title: "A inadimplência nos financiamentos imobiliários está crescendo. O que isso muda para quem vai comprar um imóvel?",
-    description:
-      "Os atrasos acima de 90 dias voltaram a subir nas linhas imobiliárias reguladas em 2026. Entenda os números e como financiar com mais margem de segurança.",
-    href: "/guias/inadimplencia-financiamento-imobiliario",
-    featured: false,
-  },
+  { category:"Financiamento", date:"11 de agosto de 2026", dateTime:"2026-08-11", title:"SAC ou Price: qual é melhor no financiamento imobiliário?", description:"Veja como entrada, renda, prazo e estratégia de amortização mudam a escolha entre SAC e Price — e por que a menor parcela inicial nem sempre significa o melhor financiamento.", href:"/guias/sac-ou-price-qual-melhor", featured:true },
+  { category:"Planejamento", date:"10 de agosto de 2026", dateTime:"2026-08-10", title:"Como juntar dinheiro para a entrada de um imóvel: um plano prático", description:"Descubra quanto falta, transforme a diferença em uma meta mensal e organize recursos próprios, FGTS e custos da compra sem perder o controle do orçamento.", href:"/guias/como-juntar-entrada-imovel", featured:false },
+  { category:"Financiamento", date:"10 de agosto de 2026", dateTime:"2026-08-10", title:"Por que é considerada a renda bruta no financiamento imobiliário? Isso é correto?", description:"Entenda por que bancos usam a renda bruta, onde esse critério faz sentido e por que ele não basta para saber se a prestação realmente cabe no orçamento.", href:"/guias/renda-bruta-financiamento-imobiliario", featured:false },
+  { category:"Financiamento", date:"10 de agosto de 2026", dateTime:"2026-08-10", title:"A inadimplência nos financiamentos imobiliários está crescendo. O que isso muda para quem vai comprar um imóvel?", description:"Os atrasos acima de 90 dias voltaram a subir nas linhas imobiliárias reguladas em 2026. Entenda os números e como financiar com mais margem de segurança.", href:"/guias/inadimplencia-financiamento-imobiliario", featured:false },
 ];
 
-export default function BlogPage() {
-  return (
-    <main id="top">
-      <Header />
-
-      <section className={styles.hero}>
-        <div className="container">
-          <span className={styles.kicker}>Blog DescompliCAZA</span>
-          <h1>Comprar melhor começa por entender melhor.</h1>
-          <p>Dados, explicações e decisões práticas para quem está planejando comprar um imóvel.</p>
-        </div>
-      </section>
-
-      <section className={styles.content}>
-        <div className="container">
-          <div className={styles.sectionHeading}>
-            <div>
-              <span className={styles.kicker}>Publicações</span>
-              <h2>Artigos recentes</h2>
-            </div>
-            <p>Conteúdo editorial e informativo, sempre com fontes indicadas quando usamos dados de mercado.</p>
-          </div>
-
-          <div className={styles.articleGrid}>
-            {articles.map((article, index) => (
-              <article className={article.featured ? styles.featuredCard : styles.card} key={article.href}>
-                <div className={styles.visual} aria-hidden="true">
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <div />
-                </div>
-                <div className={styles.cardBody}>
-                  <div className={styles.meta}>
-                    <span>{article.category}</span>
-                    <time dateTime={article.dateTime}>{article.date}</time>
-                  </div>
-                  <h2>{article.title}</h2>
-                  <p>{article.description}</p>
-                  <a href={article.href}>Ler artigo</a>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className={styles.toolsSection}>
-        <div className={`container ${styles.toolsInner}`}>
-          <div>
-            <span className={styles.kicker}>Não fique só na teoria</span>
-            <h2>Use as ferramentas do DescompliCAZA.</h2>
-          </div>
-          <div className={styles.toolLinks}>
-            <a href="/calculadoras/entrada">Calculadora de entrada</a>
-            <a href="/calculadoras/financiamento">Calculadora de financiamento</a>
-            <a href="/calculadoras/faixa-minha-casa-minha-vida">Descobrir faixa MCMV</a>
-            <a href="/checklists/documentos-mcmv">Checklist de documentos MCMV</a>
-          </div>
-        </div>
-      </section>
-
-      <footer className="footer">
-        <div className="container footer-inner">
-          <a className="footer-brand" href="/"><span className="brand-dot" /> DescompliCAZA</a>
-          <p>© 2026 DescompliCAZA.</p>
-        </div>
-      </footer>
-    </main>
-  );
-}
+export default function BlogPage(){return <main id="top"><Header/><section className={styles.hero}><div className="container"><span className={styles.kicker}>Blog DescompliCAZA</span><h1>Comprar melhor começa por entender melhor.</h1><p>Dados, explicações e decisões práticas para quem está planejando comprar um imóvel.</p></div></section><section className={styles.content}><div className="container"><div className={styles.sectionHeading}><div><span className={styles.kicker}>Publicações</span><h2>Artigos recentes</h2></div><p>Conteúdo editorial e informativo, sempre com fontes indicadas quando usamos dados de mercado.</p></div><div className={styles.articleGrid}>{articles.map((article,index)=><article className={article.featured?styles.featuredCard:styles.card} key={article.href}><div className={styles.visual} aria-hidden="true"><span>{String(index+1).padStart(2,"0")}</span><div/></div><div className={styles.cardBody}><div className={styles.meta}><span>{article.category}</span><time dateTime={article.dateTime}>{article.date}</time></div><h2>{article.title}</h2><p>{article.description}</p><a href={article.href}>Ler artigo</a></div></article>)}</div></div></section><section className={styles.toolsSection}><div className={`container ${styles.toolsInner}`}><div><span className={styles.kicker}>Não fique só na teoria</span><h2>Use as ferramentas do DescompliCAZA.</h2></div><div className={styles.toolLinks}><a href="/calculadoras/entrada">Calculadora de entrada</a><a href="/calculadoras/financiamento">Calculadora de financiamento</a><a href="/calculadoras/amortizacao">Simulador de amortização</a><a href="/calculadoras/faixa-minha-casa-minha-vida">Descobrir faixa MCMV</a><a href="/checklists/documentos-mcmv">Checklist de documentos MCMV</a></div></div></section><footer className="footer"><div className="container footer-inner"><a className="footer-brand" href="/"><span className="brand-dot"/> DescompliCAZA</a><p>© 2026 DescompliCAZA.</p></div></footer></main>}
