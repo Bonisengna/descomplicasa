@@ -1,0 +1,51 @@
+/* Espaçamento visual consistente entre cards e blocos do site */
+
+:root {
+  --card-gap: 24px;
+  --card-gap-mobile: 20px;
+}
+
+/* Home */
+.calculator-grid,
+.checklist-grid,
+.guides-grid {
+  gap: var(--card-gap) !important;
+}
+
+/* CSS Modules: grupos visuais de cards e painéis */
+[class*="articleGrid"],
+[class*="reasonList"],
+[class*="explainerCards"],
+[class*="dataGrid"],
+[class*="limitGrid"],
+[class*="metricsGrid"],
+[class*="calculatorGrid"],
+[class*="simulatorGrid"] {
+  gap: var(--card-gap) !important;
+}
+
+/* Listas de links/cards auxiliares */
+[class*="toolLinks"],
+[class*="faq"] {
+  gap: 16px !important;
+}
+
+@media (max-width: 900px) {
+  .calculator-grid,
+  .checklist-grid,
+  .guides-grid,
+  [class*="articleGrid"],
+  [class*="reasonList"],
+  [class*="explainerCards"],
+  [class*="dataGrid"],
+  [class*="limitGrid"],
+  [class*="metricsGrid"],
+  [class*="calculatorGrid"],
+  [class*="simulatorGrid"] {
+    gap: var(--card-gap-mobile) !important;
+  }
+}
+
+@media (max-width: 620px) {
+  :root { --card-gap-mobile: 18px; }
+}
