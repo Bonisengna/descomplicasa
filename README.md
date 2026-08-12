@@ -210,6 +210,19 @@ Conceito da ferramenta:
 - possibilidade de informar alíquota manual quando não houver regra municipal cadastrada;
 - ligação com o Guia de ITBI.
 
+Municípios atualmente cadastrados:
+
+- Porto Alegre - RS;
+- São Leopoldo - RS;
+- São Paulo - SP;
+- Rio de Janeiro - RJ;
+- Belo Horizonte - MG;
+- Curitiba - PR;
+- Salvador - BA;
+- Recife - PE.
+
+A ferramenta também permite contribuição comunitária de novas alíquotas pelo e-mail `suporte@descomplicaza.com.br`, sempre sujeita à validação em fonte oficial antes de inclusão no cálculo automático.
+
 A calculadora não deve assumir uma alíquota nacional. O ITBI é municipal e as regras podem variar conforme município, operação e legislação vigente.
 
 ## Checklists
