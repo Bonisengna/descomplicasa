@@ -1,0 +1,216 @@
+name: Build and deploy
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Operation to run
+        required: true
+        default: deploy
+        type: choice
+        options:
+          - deploy
+          - rollback
+      rollback_release:
+        description: Release SHA to restore; leave blank to use the previous release
+        required: false
+        type: string
+
+concurrency:
+  group: descomplicaza-production
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    if: github.event_name != 'workflow_dispatch' || inputs.operation == 'deploy'
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the exact revision
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 20.20.2
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Confirm ARM64 build architecture
+        run: test "$(uname -m)" = "aarch64"
+
+      - name: Block high and critical dependency vulnerabilities
+        run: npm audit --audit-level=high
+
+      - name: Build the standalone application
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: npm run build
+
+      - name: Assemble immutable release
+        env:
+          RELEASE_ID: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist/release/.next
+          cp -a .next/standalone/. dist/release/
+          cp -a .next/static dist/release/.next/static
+          cp -a public dist/release/public
+          printf '%s\n' "$RELEASE_ID" > dist/release/REVISION
+          tar -C dist/release -czf dist/descomplicaza.tar.gz .
+          sha256sum dist/descomplicaza.tar.gz > dist/descomplicaza.tar.gz.sha256
+
+      - name: Test activation, idempotence, failure recovery and rollback
+        run: ops/test-release-scripts.sh dist/descomplicaza.tar.gz dist/descomplicaza.tar.gz.sha256
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: descomplicaza-${{ github.sha }}
+          path: |
+            dist/descomplicaza.tar.gz
+            dist/descomplicaza.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  deploy:
+    if: github.event_name == 'push' || inputs.operation == 'deploy'
+    needs: build
+    runs-on: ubuntu-24.04
+    environment: production
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out deployment scripts
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Download the exact build artifact
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+        with:
+          name: descomplicaza-${{ github.sha }}
+          path: dist
+
+      - name: Validate non-secret deployment configuration
+        env:
+          TS_OAUTH_CLIENT_ID: ${{ vars.TS_OAUTH_CLIENT_ID }}
+          TS_AUDIENCE: ${{ vars.TS_AUDIENCE }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          APP_ROOT: ${{ vars.APP_ROOT }}
+          APP_SERVICE: ${{ vars.APP_SERVICE || 'descomplicaza' }}
+          APP_HEALTH_URL: ${{ vars.APP_HEALTH_URL || 'http://127.0.0.1:3000/api/health' }}
+          N8N_HEALTH_URL: ${{ vars.N8N_HEALTH_URL || 'http://127.0.0.1:5678/healthz' }}
+          CANARY_PORT: ${{ vars.CANARY_PORT || '3100' }}
+        run: ops/validate-config.sh
+
+      - name: Join the tailnet with GitHub OIDC
+        uses: tailscale/github-action@d1b6cd204f8dceda5b3eaad7f1f767be390056cd # v4
+        with:
+          oauth-client-id: ${{ vars.TS_OAUTH_CLIENT_ID }}
+          audience: ${{ vars.TS_AUDIENCE }}
+          tags: tag:ci
+          ping: ${{ vars.DEPLOY_HOST }}
+
+      - name: Confirm application and n8n are healthy before upload
+        env:
+          TARGET: ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }}
+          APP_ROOT: ${{ vars.APP_ROOT }}
+          APP_SERVICE: ${{ vars.APP_SERVICE || 'descomplicaza' }}
+          APP_HEALTH_URL: ${{ vars.APP_HEALTH_URL || 'http://127.0.0.1:3000/api/health' }}
+          N8N_HEALTH_URL: ${{ vars.N8N_HEALTH_URL || 'http://127.0.0.1:5678/healthz' }}
+        run: |
+          set -euo pipefail
+          tailscale ssh "$TARGET" \
+            "APP_ROOT='$APP_ROOT' APP_SERVICE='$APP_SERVICE' APP_HEALTH_URL='$APP_HEALTH_URL' N8N_HEALTH_URL='$N8N_HEALTH_URL' sh -s -- preflight" \
+            < ops/remote-check.sh
+
+      - name: Upload verified release and deployment script
+        env:
+          TARGET: ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }}
+          APP_ROOT: ${{ vars.APP_ROOT }}
+          RELEASE_ID: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          remote_inbox="$APP_ROOT/incoming/$RELEASE_ID"
+          tailscale ssh "$TARGET" "umask 077; mkdir -p '$remote_inbox'"
+          tailscale ssh "$TARGET" "cat > '$remote_inbox/descomplicaza.tar.gz'" < dist/descomplicaza.tar.gz
+          tailscale ssh "$TARGET" "cat > '$remote_inbox/descomplicaza.tar.gz.sha256'" < dist/descomplicaza.tar.gz.sha256
+          tailscale ssh "$TARGET" "cat > '$remote_inbox/deploy-release.sh'" < ops/deploy-release.sh
+          tailscale ssh "$TARGET" "chmod 700 '$remote_inbox/deploy-release.sh'"
+
+      - name: Activate release with health check and automatic rollback
+        env:
+          TARGET: ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }}
+          APP_ROOT: ${{ vars.APP_ROOT }}
+          RELEASE_ID: ${{ github.sha }}
+          APP_SERVICE: ${{ vars.APP_SERVICE || 'descomplicaza' }}
+          APP_HEALTH_URL: ${{ vars.APP_HEALTH_URL || 'http://127.0.0.1:3000/api/health' }}
+          N8N_HEALTH_URL: ${{ vars.N8N_HEALTH_URL || 'http://127.0.0.1:5678/healthz' }}
+          CANARY_PORT: ${{ vars.CANARY_PORT || '3100' }}
+        run: |
+          set -euo pipefail
+          remote_inbox="$APP_ROOT/incoming/$RELEASE_ID"
+          tailscale ssh "$TARGET" \
+            "APP_ROOT='$APP_ROOT' APP_SERVICE='$APP_SERVICE' APP_HEALTH_URL='$APP_HEALTH_URL' N8N_HEALTH_URL='$N8N_HEALTH_URL' CANARY_PORT='$CANARY_PORT' '$remote_inbox/deploy-release.sh' '$remote_inbox/descomplicaza.tar.gz' '$remote_inbox/descomplicaza.tar.gz.sha256' '$RELEASE_ID'"
+
+  rollback:
+    if: github.event_name == 'workflow_dispatch' && inputs.operation == 'rollback'
+    runs-on: ubuntu-24.04
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out rollback script
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Validate non-secret deployment configuration
+        env:
+          TS_OAUTH_CLIENT_ID: ${{ vars.TS_OAUTH_CLIENT_ID }}
+          TS_AUDIENCE: ${{ vars.TS_AUDIENCE }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          APP_ROOT: ${{ vars.APP_ROOT }}
+          APP_SERVICE: ${{ vars.APP_SERVICE || 'descomplicaza' }}
+          APP_HEALTH_URL: ${{ vars.APP_HEALTH_URL || 'http://127.0.0.1:3000/api/health' }}
+          N8N_HEALTH_URL: ${{ vars.N8N_HEALTH_URL || 'http://127.0.0.1:5678/healthz' }}
+          CANARY_PORT: ${{ vars.CANARY_PORT || '3100' }}
+        run: ops/validate-config.sh
+
+      - name: Join the tailnet with GitHub OIDC
+        uses: tailscale/github-action@d1b6cd204f8dceda5b3eaad7f1f767be390056cd # v4
+        with:
+          oauth-client-id: ${{ vars.TS_OAUTH_CLIENT_ID }}
+          audience: ${{ vars.TS_AUDIENCE }}
+          tags: tag:ci
+          ping: ${{ vars.DEPLOY_HOST }}
+
+      - name: Roll back and verify both services
+        env:
+          TARGET: ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }}
+          APP_ROOT: ${{ vars.APP_ROOT }}
+          APP_SERVICE: ${{ vars.APP_SERVICE || 'descomplicaza' }}
+          APP_HEALTH_URL: ${{ vars.APP_HEALTH_URL || 'http://127.0.0.1:3000/api/health' }}
+          N8N_HEALTH_URL: ${{ vars.N8N_HEALTH_URL || 'http://127.0.0.1:5678/healthz' }}
+          CANARY_PORT: ${{ vars.CANARY_PORT || '3100' }}
+          ROLLBACK_RELEASE: ${{ inputs.rollback_release }}
+        run: |
+          set -euo pipefail
+          tailscale ssh "$TARGET" \
+            "APP_ROOT='$APP_ROOT' APP_SERVICE='$APP_SERVICE' APP_HEALTH_URL='$APP_HEALTH_URL' N8N_HEALTH_URL='$N8N_HEALTH_URL' CANARY_PORT='$CANARY_PORT' ROLLBACK_RELEASE='$ROLLBACK_RELEASE' sh -s -- rollback" \
+            < ops/rollback-release.sh
