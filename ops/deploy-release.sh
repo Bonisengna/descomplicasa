@@ -121,8 +121,8 @@ else
     /^\// { bad = 1 }
     {
       count = split($0, part, "/")
-      for (index = 1; index <= count; index += 1) {
-        if (part[index] == "..") bad = 1
+      for (item = 1; item <= count; item += 1) {
+        if (part[item] == "..") bad = 1
       }
     }
     END { exit bad ? 1 : 0 }
