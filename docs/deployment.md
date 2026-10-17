@@ -72,7 +72,7 @@ O bootstrap:
 2. registra o diretório atual como rollback legado, sem copiar ou limpar `.next`, `node_modules` ou arquivos modificados;
 3. instala a configuração e os scripts administrativos;
 4. testa o inicializador novo na porta 3100;
-5. instala `descomplicaza-pull` no runit do Termux com um arquivo `down`, portanto ainda desativado;
+5. monta `descomplicaza-pull` fora do diretório observado pelo runit, cria primeiro o arquivo `down` e só então move o serviço completo para o Termux, portanto ele nunca fica visível em estado ativo durante a instalação;
 6. confirma novamente a saúde do site e do n8n sem reiniciar o processo que está no ar.
 
 Se o telefone reiniciar depois desse bootstrap, o inicializador novo ainda consegue abrir o build legado. O arquivo anterior também fica salvo como `/usr/local/bin/descomplicaza-start.pre-cicd`.
