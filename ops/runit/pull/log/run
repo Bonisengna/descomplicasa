@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+
+log_dir=${DESCOMPLICAZA_PULL_LOG_DIR:-/var/log/descomplicaza-pull}
+mkdir -p "$log_dir"
+exec svlogd -tt "$log_dir"
