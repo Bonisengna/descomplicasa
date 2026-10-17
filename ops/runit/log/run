@@ -1,0 +1,6 @@
+#!/data/data/com.termux/files/usr/bin/sh
+set -eu
+
+log_dir=${DESCOMPLICAZA_LOG_DIR:-/data/data/com.termux/files/usr/var/log/descomplicaza}
+mkdir -p "$log_dir"
+exec /data/data/com.termux/files/usr/bin/svlogd -tt "$log_dir"

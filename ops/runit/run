@@ -1,0 +1,5 @@
+#!/data/data/com.termux/files/usr/bin/sh
+exec 2>&1
+
+exec proot-distro login debian \
+  -- /usr/local/bin/descomplicaza-start

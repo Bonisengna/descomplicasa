@@ -1,0 +1,132 @@
+name: Build and publish release
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: descomplicaza-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the exact revision
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 20.20.2
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Confirm ARM64 build architecture
+        run: test "$(uname -m)" = "aarch64"
+
+      - name: Block high and critical dependency vulnerabilities
+        run: npm audit --audit-level=high
+
+      - name: Build the standalone application
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: npm run build
+
+      - name: Validate deployment shell scripts
+        run: |
+          set -euo pipefail
+          for script in ops/*.sh ops/runit/run ops/runit/log/run ops/runit/pull/run ops/runit/pull/log/run; do
+            sh -n "$script"
+          done
+
+      - name: Assemble immutable release
+        env:
+          RELEASE_ID: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist/release/.next
+          cp -a .next/standalone/. dist/release/
+          cp -a .next/static dist/release/.next/static
+          cp -a public dist/release/public
+          printf '%s\n' "$RELEASE_ID" > dist/release/REVISION
+          tar -C dist/release -czf dist/descomplicaza.tar.gz .
+          (
+            cd dist
+            sha256sum descomplicaza.tar.gz > descomplicaza.tar.gz.sha256
+          )
+
+      - name: Test activation, idempotence, failure recovery and rollback
+        run: ops/test-release-scripts.sh dist/descomplicaza.tar.gz dist/descomplicaza.tar.gz.sha256
+
+      - name: Test release discovery and verified download
+        run: ops/test-pull-release.sh
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: descomplicaza-${{ github.sha }}
+          path: |
+            dist/descomplicaza.tar.gz
+            dist/descomplicaza.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-24.04
+    environment: production
+    permissions:
+      contents: write
+    steps:
+      - name: Download the exact build artifact
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+        with:
+          name: descomplicaza-${{ github.sha }}
+          path: dist
+
+      - name: Validate release files
+        run: |
+          set -euo pipefail
+          cd dist
+          sha256sum --check descomplicaza.tar.gz.sha256
+          test -s descomplicaza.tar.gz
+
+      - name: Publish release for the phone to retrieve
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ID: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          tag="deploy-$RELEASE_ID"
+
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            target=$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json targetCommitish --jq '.targetCommitish')
+            test "$target" = "$RELEASE_ID"
+            assets=$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json assets --jq '[.assets[].name] | sort | join(" ")')
+            test "$assets" = "descomplicaza.tar.gz descomplicaza.tar.gz.sha256"
+            printf 'Release %s already exists with the expected immutable assets.\n' "$tag"
+            exit 0
+          fi
+
+          gh release create "$tag" \
+            dist/descomplicaza.tar.gz \
+            dist/descomplicaza.tar.gz.sha256 \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$RELEASE_ID" \
+            --title "Deploy $RELEASE_ID" \
+            --notes "ARM64 production candidate built and validated by GitHub Actions."
