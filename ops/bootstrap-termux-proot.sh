@@ -87,11 +87,18 @@ fi
 
 config_tmp=$(mktemp)
 canary_pid=
+pull_staging=
 cleanup() {
   rm -f "$config_tmp"
   if [ -n "$canary_pid" ]; then
     kill "$canary_pid" 2>/dev/null || true
     wait "$canary_pid" 2>/dev/null || true
+  fi
+  if [ -n "$pull_staging" ]; then
+    case "$pull_staging" in
+      "$termux_prefix"/var/tmp/descomplicaza-pull.*) rm -rf "$pull_staging" ;;
+      *) echo "Refusing to clean unsafe pull staging path: $pull_staging" >&2 ;;
+    esac
   fi
 }
 trap cleanup EXIT INT TERM
@@ -158,11 +165,25 @@ kill "$canary_pid" 2>/dev/null || true
 wait "$canary_pid" 2>/dev/null || true
 canary_pid=
 
-install -d -m 755 "$pull_service/log"
-install -m 700 "$script_dir/runit/pull/run" "$pull_service/run"
-install -m 700 "$script_dir/runit/pull/log/run" "$pull_service/log/run"
-if [ ! -e "$pull_service/down" ]; then
-  : > "$pull_service/down"
+if [ -e "$pull_service" ]; then
+  test -d "$pull_service"
+  if [ ! -f "$pull_service/down" ]; then
+    echo "Existing pull service is not marked down; refusing to modify a possibly active service." >&2
+    exit 1
+  fi
+  install -d -m 755 "$pull_service/log"
+  install -m 700 "$script_dir/runit/pull/log/run" "$pull_service/log/run"
+  install -m 700 "$script_dir/runit/pull/run" "$pull_service/run"
+else
+  install -d -m 755 "$termux_prefix/var/tmp"
+  pull_staging=$(mktemp -d "$termux_prefix/var/tmp/descomplicaza-pull.XXXXXX")
+  install -d -m 755 "$pull_staging/log"
+  : > "$pull_staging/down"
+  chmod 600 "$pull_staging/down"
+  install -m 700 "$script_dir/runit/pull/log/run" "$pull_staging/log/run"
+  install -m 700 "$script_dir/runit/pull/run" "$pull_staging/run"
+  mv "$pull_staging" "$pull_service"
+  pull_staging=
 fi
 chmod 600 "$pull_service/down"
 
