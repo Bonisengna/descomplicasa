@@ -77,6 +77,20 @@ wait_for_revision() {
   return 1
 }
 
+wait_for_http() {
+  url=$1
+  attempts=${2:-30}
+  count=0
+  while [ "$count" -lt "$attempts" ]; do
+    if curl --fail --silent --show-error --max-time 5 "$url" >/dev/null 2>&1; then
+      return 0
+    fi
+    count=$((count + 1))
+    sleep 1
+  done
+  return 1
+}
+
 restore_previous() {
   old_target=$1
   old_previous=${2:-}
@@ -92,7 +106,7 @@ restore_previous() {
       rm -f "$previous_link"
     fi
     "$SV_BIN" restart "$APP_SERVICE" || true
-    if ! curl --fail --silent --show-error --max-time 10 "$CURRENT_HEALTH_URL" >/dev/null; then
+    if ! wait_for_http "$CURRENT_HEALTH_URL" "$HEALTHCHECK_ATTEMPTS"; then
       echo "WARNING: previous release did not recover its health check" >&2
     fi
   fi
