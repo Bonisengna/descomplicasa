@@ -14,7 +14,7 @@ test -r "$config_file"
 : "${CANARY_PORT:=3100}"
 : "${GITHUB_REPOSITORY:=Bonisengna/descomplicasa}"
 : "${DEPLOY_TOOL_DIR:=/usr/local/lib/descomplicaza-deploy}"
-: "${PULL_INTERVAL_SECONDS:=600}"
+: "${PULL_INTERVAL_SECONDS:=2592000}"
 
 case "$PULL_INTERVAL_SECONDS" in
   *[!0-9]*|'') echo "PULL_INTERVAL_SECONDS must be numeric" >&2; exit 1 ;;

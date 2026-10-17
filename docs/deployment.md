@@ -1,6 +1,6 @@
 # Deploy seguro no Moto G30
 
-O deploy usa um modelo de busca: o GitHub compila o Next.js em ARM64 e publica dois arquivos em uma Release pública. Um serviço separado no Moto G30 consulta o GitHub a cada dez minutos e só instala uma revisão depois de validar a origem dos arquivos, o SHA-256, uma inicialização em porta canário e a saúde do site e do n8n.
+O deploy usa um modelo de busca: o GitHub compila o Next.js em ARM64 e publica dois arquivos em uma Release pública. Um serviço separado no Moto G30 consulta o GitHub a cada 30 dias e só instala uma revisão depois de validar a origem dos arquivos, o SHA-256, uma inicialização em porta canário e a saúde do site e do n8n. Também é possível iniciar essa consulta manualmente a qualquer momento.
 
 O GitHub não abre uma conexão com o telefone. Não há senha, chave SSH, token do Tailscale ou outro segredo permanente no repositório. O `GITHUB_TOKEN` usado para publicar a Release é temporário, fornecido pelo próprio GitHub Actions e limitado ao job de publicação.
 
@@ -40,7 +40,7 @@ A configuração também fica fora da aplicação, normalmente em `/etc/descompl
 | `CANARY_PORT` | `3100` | Porta temporária de validação |
 | `GITHUB_REPOSITORY` | `Bonisengna/descomplicasa` | Origem permitida |
 | `DEPLOY_TOOL_DIR` | `/usr/local/lib/descomplicaza-deploy` | Scripts administrativos |
-| `PULL_INTERVAL_SECONDS` | `600` | Intervalo de consulta; mínimo 60 |
+| `PULL_INTERVAL_SECONDS` | `2592000` | Intervalo de 30 dias; mínimo 60 |
 
 ## Bootstrap único
 
@@ -55,6 +55,21 @@ Antes de ativar o buscador:
 5. Executar `pull-release.sh` uma vez manualmente. Somente após esse teste instalar e iniciar o serviço runit `descomplicaza-pull`.
 
 O template do buscador está em `ops/runit/pull/run`. Ele continua tentando após erros de rede ou de validação; qualquer falha preserva a versão que já está no ar.
+
+## Consulta manual
+
+Para procurar e instalar uma nova versão sem esperar os 30 dias:
+
+```sh
+. /etc/descomplicaza.env
+/usr/local/lib/descomplicaza-deploy/pull-release.sh
+```
+
+Se uma consulta automática já estiver em andamento, o comando manual termina sem iniciar um segundo deploy. Depois que o serviço runit estiver instalado, reiniciá-lo também força uma consulta imediata:
+
+```sh
+sv restart descomplicaza-pull
+```
 
 ## Rollback
 
