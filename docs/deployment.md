@@ -34,8 +34,10 @@ A configuração também fica fora da aplicação, normalmente em `/etc/descompl
 | Variável | Padrão ou exemplo | Finalidade |
 | --- | --- | --- |
 | `APP_ROOT` | `/srv/descomplicaza` | Diretório exclusivo das releases |
-| `APP_SERVICE` | `descomplicaza` | Serviço runit do site |
-| `APP_HEALTH_URL` | `http://127.0.0.1:3000/api/health` | Saúde da versão ativa |
+| `APP_SERVICE` | `descomplicaza` | Nome ou caminho completo do serviço runit |
+| `SV_BIN` | `sv` | Comando `sv`; pode apontar para o binário do Termux |
+| `CURRENT_HEALTH_URL` | `http://127.0.0.1:3000/` | Saúde compatível com o site que já está no ar |
+| `APP_HEALTH_URL` | `http://127.0.0.1:3000/api/health` | Saúde versionada das novas releases |
 | `N8N_HEALTH_URL` | `http://127.0.0.1:5678/healthz` | Trava de saúde do n8n |
 | `CANARY_PORT` | `3100` | Porta temporária de validação |
 | `GITHUB_REPOSITORY` | `Bonisengna/descomplicasa` | Origem permitida |
@@ -48,10 +50,10 @@ O bootstrap não deve ser executado até confirmar os caminhos reais usados pelo
 
 Antes de ativar o buscador:
 
-1. Descobrir o arquivo `run` real do serviço `descomplicaza` e o diretório onde a aplicação atual está instalada.
+1. Descobrir o arquivo `run` real do serviço `descomplicaza`, o diretório onde a aplicação atual está instalada e como o `sv` do Termux pode ser chamado a partir do Debian.
 2. Copiar os scripts administrativos e a configuração para dentro do Debian, com escrita restrita ao administrador.
 3. Registrar o build atual em `APP_ROOT/releases/<revisao-atual>` e criar os links `current` e `previous`.
-4. Validar manualmente `descomplicaza`, `/api/health` e o `/healthz` do n8n.
+4. Validar manualmente o site atual em `/`, o `/healthz` do n8n e o controle do serviço externo sem reiniciá-lo. A rota `/api/health` é exigida somente das novas releases.
 5. Executar `pull-release.sh` uma vez manualmente. Somente após esse teste instalar e iniciar o serviço runit `descomplicaza-pull`.
 
 O template do buscador está em `ops/runit/pull/run`. Ele continua tentando após erros de rede ou de validação; qualquer falha preserva a versão que já está no ar.

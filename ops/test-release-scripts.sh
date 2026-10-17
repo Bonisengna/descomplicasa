@@ -83,7 +83,9 @@ n8n_pid=$!
 
 export PATH="$fake_bin:$PATH"
 export APP_ROOT="$app_root"
-export APP_SERVICE=descomplicaza
+export APP_SERVICE="$test_root/service/descomplicaza"
+export SV_BIN="$fake_bin/sv"
+export CURRENT_HEALTH_URL="http://127.0.0.1:$prod_port/"
 export APP_HEALTH_URL="http://127.0.0.1:$prod_port/api/health"
 export N8N_HEALTH_URL="http://127.0.0.1:$n8n_port/healthz"
 export CANARY_PORT="$canary_port"
@@ -104,6 +106,7 @@ while [ "$attempt" -lt "$HEALTHCHECK_ATTEMPTS" ]; do
   sleep 1
 done
 test "$attempt" -lt "$HEALTHCHECK_ATTEMPTS"
+"$project_root/ops/remote-check.sh"
 
 stage_release() {
   release=$1

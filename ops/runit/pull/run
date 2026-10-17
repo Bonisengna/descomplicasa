@@ -9,6 +9,8 @@ test -r "$config_file"
 
 : "${APP_ROOT:?APP_ROOT is required}"
 : "${APP_SERVICE:=descomplicaza}"
+: "${SV_BIN:=sv}"
+: "${CURRENT_HEALTH_URL:=http://127.0.0.1:3000/}"
 : "${APP_HEALTH_URL:=http://127.0.0.1:3000/api/health}"
 : "${N8N_HEALTH_URL:=http://127.0.0.1:5678/healthz}"
 : "${CANARY_PORT:=3100}"
@@ -21,7 +23,7 @@ case "$PULL_INTERVAL_SECONDS" in
 esac
 test "$PULL_INTERVAL_SECONDS" -ge 60
 test -x "$DEPLOY_TOOL_DIR/pull-release.sh"
-export APP_ROOT APP_SERVICE APP_HEALTH_URL N8N_HEALTH_URL CANARY_PORT GITHUB_REPOSITORY
+export APP_ROOT APP_SERVICE SV_BIN CURRENT_HEALTH_URL APP_HEALTH_URL N8N_HEALTH_URL CANARY_PORT GITHUB_REPOSITORY
 
 while :; do
   "$DEPLOY_TOOL_DIR/pull-release.sh" || echo "Release check failed; current version was preserved." >&2

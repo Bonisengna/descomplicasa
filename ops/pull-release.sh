@@ -7,6 +7,8 @@ script_dir=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
 
 : "${APP_ROOT:?APP_ROOT is required}"
 : "${APP_SERVICE:=descomplicaza}"
+: "${SV_BIN:=sv}"
+: "${CURRENT_HEALTH_URL:=http://127.0.0.1:3000/}"
 : "${APP_HEALTH_URL:=http://127.0.0.1:3000/api/health}"
 : "${N8N_HEALTH_URL:=http://127.0.0.1:5678/healthz}"
 : "${CANARY_PORT:=3100}"
@@ -29,7 +31,9 @@ case "$GITHUB_REPOSITORY" in
   *[!A-Za-z0-9._/-]*|/*|*/|*/*/*|'') echo "Invalid GitHub repository" >&2; exit 1 ;;
 esac
 
-test "$APP_SERVICE" != "n8n"
+case "$APP_SERVICE" in
+  n8n|*/n8n) echo "APP_SERVICE must not target n8n" >&2; exit 1 ;;
+esac
 test -x "$DEPLOY_SCRIPT"
 test -x "$PREFLIGHT_SCRIPT"
 command -v curl >/dev/null
@@ -75,7 +79,8 @@ trap 'exit 143' TERM
 
 APP_ROOT="$APP_ROOT" \
 APP_SERVICE="$APP_SERVICE" \
-APP_HEALTH_URL="$APP_HEALTH_URL" \
+SV_BIN="$SV_BIN" \
+CURRENT_HEALTH_URL="$CURRENT_HEALTH_URL" \
 N8N_HEALTH_URL="$N8N_HEALTH_URL" \
 "$PREFLIGHT_SCRIPT"
 
@@ -135,6 +140,8 @@ work_dir=
 
 APP_ROOT="$APP_ROOT" \
 APP_SERVICE="$APP_SERVICE" \
+SV_BIN="$SV_BIN" \
+CURRENT_HEALTH_URL="$CURRENT_HEALTH_URL" \
 APP_HEALTH_URL="$APP_HEALTH_URL" \
 N8N_HEALTH_URL="$N8N_HEALTH_URL" \
 CANARY_PORT="$CANARY_PORT" \

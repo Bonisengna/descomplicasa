@@ -139,4 +139,9 @@ if node "$project_root/ops/parse-release.mjs" "$test_root/fixtures/invalid-relea
   exit 1
 fi
 
+if APP_SERVICE="$test_root/service/n8n" "$project_root/ops/pull-release.sh" >/dev/null 2>&1; then
+  echo "The pull deployer unexpectedly accepted the n8n service" >&2
+  exit 1
+fi
+
 printf 'Pull release tests passed.\n'

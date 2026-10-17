@@ -9,6 +9,8 @@ release_id=${3:?release id is required}
 
 : "${APP_ROOT:?APP_ROOT is required}"
 : "${APP_SERVICE:=descomplicaza}"
+: "${SV_BIN:=sv}"
+: "${CURRENT_HEALTH_URL:=http://127.0.0.1:3000/}"
 : "${APP_HEALTH_URL:=http://127.0.0.1:3000/api/health}"
 : "${N8N_HEALTH_URL:=http://127.0.0.1:5678/healthz}"
 : "${CANARY_PORT:=3100}"
@@ -38,8 +40,14 @@ case "$HEALTHCHECK_ATTEMPTS" in
   *[!0-9]*|'') echo "Invalid health check attempts" >&2; exit 1 ;;
 esac
 
-test "$APP_SERVICE" != "n8n"
+case "$APP_SERVICE" in
+  n8n|*/n8n) echo "APP_SERVICE must not target n8n" >&2; exit 1 ;;
+esac
 test "$CANARY_PORT" -ne 3000
+case "$SV_BIN" in
+  */*) test -x "$SV_BIN" ;;
+  *) command -v "$SV_BIN" >/dev/null ;;
+esac
 
 releases_dir="$APP_ROOT/releases"
 release_dir="$releases_dir/$release_id"
@@ -83,12 +91,9 @@ restore_previous() {
     else
       rm -f "$previous_link"
     fi
-    sv restart "$APP_SERVICE" || true
-    old_revision=$(cat "$old_target/REVISION" 2>/dev/null || true)
-    if [ -n "$old_revision" ]; then
-      if ! wait_for_revision "$APP_HEALTH_URL" "$old_revision" "$HEALTHCHECK_ATTEMPTS"; then
-        echo "WARNING: previous release did not recover its health check" >&2
-      fi
+    "$SV_BIN" restart "$APP_SERVICE" || true
+    if ! curl --fail --silent --show-error --max-time 10 "$CURRENT_HEALTH_URL" >/dev/null; then
+      echo "WARNING: previous release did not recover its health check" >&2
     fi
   fi
 }
@@ -101,8 +106,8 @@ cleanup_canary() {
 }
 trap cleanup_canary EXIT INT TERM
 
-sv status "$APP_SERVICE" | grep '^run:' >/dev/null
-curl --fail --silent --show-error --max-time 10 "$APP_HEALTH_URL" >/dev/null
+"$SV_BIN" status "$APP_SERVICE" | grep '^run:' >/dev/null
+curl --fail --silent --show-error --max-time 10 "$CURRENT_HEALTH_URL" >/dev/null
 curl --fail --silent --show-error --max-time 10 "$N8N_HEALTH_URL" >/dev/null
 test -L "$current_link"
 
@@ -184,7 +189,7 @@ previous_replacement="$APP_ROOT/.previous-$release_id-$$"
 ln -s "$old_target" "$previous_replacement"
 mv -Tf "$previous_replacement" "$previous_link"
 
-if ! sv restart "$APP_SERVICE"; then
+if ! "$SV_BIN" restart "$APP_SERVICE"; then
   restore_previous "$old_target" "$old_previous"
   echo "Service restart failed; previous release restored" >&2
   exit 1

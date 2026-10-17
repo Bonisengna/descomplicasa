@@ -3,6 +3,7 @@ set -eu
 
 : "${APP_ROOT:?APP_ROOT is required}"
 : "${APP_SERVICE:=descomplicaza}"
+: "${SV_BIN:=sv}"
 : "${APP_HEALTH_URL:=http://127.0.0.1:3000/api/health}"
 : "${N8N_HEALTH_URL:=http://127.0.0.1:5678/healthz}"
 : "${CANARY_PORT:=3100}"
@@ -20,7 +21,13 @@ case "$APP_ROOT" in
     ;;
 esac
 
-test "$APP_SERVICE" != "n8n"
+case "$APP_SERVICE" in
+  n8n|*/n8n) echo "APP_SERVICE must not target n8n" >&2; exit 1 ;;
+esac
+case "$SV_BIN" in
+  */*) test -x "$SV_BIN" ;;
+  *) command -v "$SV_BIN" >/dev/null ;;
+esac
 case "$CANARY_PORT" in
   *[!0-9]*|'') echo "Invalid canary port" >&2; exit 1 ;;
 esac
@@ -81,11 +88,11 @@ replacement="$APP_ROOT/.current-rollback-$$"
 ln -s "$target" "$replacement"
 mv -Tf "$replacement" "$APP_ROOT/current"
 
-if ! sv restart "$APP_SERVICE"; then
+if ! "$SV_BIN" restart "$APP_SERVICE"; then
   failed="$APP_ROOT/.current-failed-rollback-$$"
   ln -s "$old_target" "$failed"
   mv -Tf "$failed" "$APP_ROOT/current"
-  sv restart "$APP_SERVICE" || true
+  "$SV_BIN" restart "$APP_SERVICE" || true
   exit 1
 fi
 
@@ -103,7 +110,7 @@ if [ "$attempt" -ge "$HEALTHCHECK_ATTEMPTS" ] || ! curl --fail --silent --show-e
   failed="$APP_ROOT/.current-failed-rollback-$$"
   ln -s "$old_target" "$failed"
   mv -Tf "$failed" "$APP_ROOT/current"
-  sv restart "$APP_SERVICE" || true
+  "$SV_BIN" restart "$APP_SERVICE" || true
   echo "Rollback health check failed; original release restored" >&2
   exit 1
 fi
