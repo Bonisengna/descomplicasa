@@ -4,11 +4,14 @@ set -eu
 : "${APP_ROOT:?APP_ROOT is required}"
 : "${APP_SERVICE:=descomplicaza}"
 : "${SV_BIN:=sv}"
+: "${CURRENT_HEALTH_URL:=http://127.0.0.1:3000/}"
 : "${APP_HEALTH_URL:=http://127.0.0.1:3000/api/health}"
 : "${N8N_HEALTH_URL:=http://127.0.0.1:5678/healthz}"
 : "${CANARY_PORT:=3100}"
 : "${ROLLBACK_RELEASE:=}"
 : "${HEALTHCHECK_ATTEMPTS:=45}"
+script_dir=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
+: "${START_SCRIPT:=$script_dir/start-release.sh}"
 
 case "$APP_ROOT" in
   /*) ;;
@@ -28,6 +31,7 @@ case "$SV_BIN" in
   */*) test -x "$SV_BIN" ;;
   *) command -v "$SV_BIN" >/dev/null ;;
 esac
+test -x "$START_SCRIPT"
 case "$CANARY_PORT" in
   *[!0-9]*|'') echo "Invalid canary port" >&2; exit 1 ;;
 esac
@@ -50,8 +54,55 @@ else
 fi
 
 test -d "$target"
-test -f "$target/server.js"
+if [ ! -f "$target/server.js" ] && [ ! -f "$target/.legacy-source" ]; then
+  echo "Rollback target has neither server.js nor a legacy source marker" >&2
+  exit 1
+fi
+test -f "$target/REVISION"
 revision=$(cat "$target/REVISION")
+
+wait_for_revision() {
+  url=$1
+  wanted=$2
+  attempts=${3:-30}
+  count=0
+  while [ "$count" -lt "$attempts" ]; do
+    response=$(curl --fail --silent --show-error --max-time 5 "$url" 2>/dev/null || true)
+    if printf '%s' "$response" | grep -F "\"revision\":\"$wanted\"" >/dev/null; then
+      return 0
+    fi
+    count=$((count + 1))
+    sleep 1
+  done
+  return 1
+}
+
+wait_for_http() {
+  url=$1
+  attempts=${2:-30}
+  count=0
+  while [ "$count" -lt "$attempts" ]; do
+    if curl --fail --silent --show-error --max-time 5 "$url" >/dev/null 2>&1; then
+      return 0
+    fi
+    count=$((count + 1))
+    sleep 1
+  done
+  return 1
+}
+
+restore_original() {
+  failed="$APP_ROOT/.current-failed-rollback-$$"
+  ln -s "$old_target" "$failed"
+  mv -Tf "$failed" "$APP_ROOT/current"
+  "$SV_BIN" restart "$APP_SERVICE" || true
+  if [ -f "$old_target/.legacy-source" ]; then
+    wait_for_http "$CURRENT_HEALTH_URL" "$HEALTHCHECK_ATTEMPTS" || true
+  else
+    old_revision=$(cat "$old_target/REVISION")
+    wait_for_revision "$APP_HEALTH_URL" "$old_revision" "$HEALTHCHECK_ATTEMPTS" || true
+  fi
+}
 
 cleanup_canary() {
   if [ -n "${canary_pid:-}" ]; then
@@ -61,22 +112,23 @@ cleanup_canary() {
 }
 trap cleanup_canary EXIT INT TERM
 
-(
-  cd "$target"
-  APP_REVISION="$revision" HOSTNAME=127.0.0.1 PORT="$CANARY_PORT" node server.js
-) > "$target/rollback-canary.log" 2>&1 &
+DESCOMPLICAZA_ENV_FILE=${DESCOMPLICAZA_ENV_FILE:-/etc/descomplicaza.env} \
+RELEASE_DIR="$target" START_HOSTNAME=127.0.0.1 START_PORT="$CANARY_PORT" \
+  "$START_SCRIPT" > "$target/rollback-canary.log" 2>&1 &
 canary_pid=$!
 
-attempt=0
-while [ "$attempt" -lt "$HEALTHCHECK_ATTEMPTS" ]; do
-  response=$(curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$CANARY_PORT/api/health" 2>/dev/null || true)
-  if printf '%s' "$response" | grep -F "\"revision\":\"$revision\"" >/dev/null; then
-    break
+if [ -f "$target/.legacy-source" ]; then
+  canary_ok=false
+  if wait_for_http "http://127.0.0.1:$CANARY_PORT/" "$HEALTHCHECK_ATTEMPTS"; then
+    canary_ok=true
   fi
-  attempt=$((attempt + 1))
-  sleep 1
-done
-if [ "$attempt" -ge "$HEALTHCHECK_ATTEMPTS" ]; then
+else
+  canary_ok=false
+  if wait_for_revision "http://127.0.0.1:$CANARY_PORT/api/health" "$revision" "$HEALTHCHECK_ATTEMPTS"; then
+    canary_ok=true
+  fi
+fi
+if [ "$canary_ok" != true ]; then
   echo "Rollback canary health check failed" >&2
   tail -n 80 "$target/rollback-canary.log" >&2 || true
   exit 1
@@ -89,28 +141,24 @@ ln -s "$target" "$replacement"
 mv -Tf "$replacement" "$APP_ROOT/current"
 
 if ! "$SV_BIN" restart "$APP_SERVICE"; then
-  failed="$APP_ROOT/.current-failed-rollback-$$"
-  ln -s "$old_target" "$failed"
-  mv -Tf "$failed" "$APP_ROOT/current"
-  "$SV_BIN" restart "$APP_SERVICE" || true
+  restore_original
   exit 1
 fi
 
-attempt=0
-while [ "$attempt" -lt "$HEALTHCHECK_ATTEMPTS" ]; do
-  response=$(curl --fail --silent --show-error --max-time 5 "$APP_HEALTH_URL" 2>/dev/null || true)
-  if printf '%s' "$response" | grep -F "\"revision\":\"$revision\"" >/dev/null; then
-    break
+if [ -f "$target/.legacy-source" ]; then
+  production_ok=false
+  if wait_for_http "$CURRENT_HEALTH_URL" "$HEALTHCHECK_ATTEMPTS"; then
+    production_ok=true
   fi
-  attempt=$((attempt + 1))
-  sleep 1
-done
+else
+  production_ok=false
+  if wait_for_revision "$APP_HEALTH_URL" "$revision" "$HEALTHCHECK_ATTEMPTS"; then
+    production_ok=true
+  fi
+fi
 
-if [ "$attempt" -ge "$HEALTHCHECK_ATTEMPTS" ] || ! curl --fail --silent --show-error --max-time 10 "$N8N_HEALTH_URL" >/dev/null; then
-  failed="$APP_ROOT/.current-failed-rollback-$$"
-  ln -s "$old_target" "$failed"
-  mv -Tf "$failed" "$APP_ROOT/current"
-  "$SV_BIN" restart "$APP_SERVICE" || true
+if [ "$production_ok" != true ] || ! curl --fail --silent --show-error --max-time 10 "$N8N_HEALTH_URL" >/dev/null; then
+  restore_original
   echo "Rollback health check failed; original release restored" >&2
   exit 1
 fi

@@ -502,9 +502,9 @@ Por padrão, o Next.js inicia na porta `3000`.
 
 ## Deploy atual
 
-O build de produção é executado no GitHub Actions e enviado pela tailnet ao Debian 12 ARM64 do Moto G30. A conexão do runner usa identidade OIDC temporária, sem chave SSH, senha ou token estático armazenado no GitHub.
+O build de produção é executado em ARM64 pelo GitHub Actions e publicado como uma GitHub Release. O Moto G30 busca essa release por HTTPS a cada 30 dias ou por comando manual. O GitHub não abre conexão com o telefone e não armazena senha, chave SSH ou token do Tailscale.
 
-O servidor valida o checksum e a nova versão em uma porta canário antes de trocar a release ativa. Falhas no restart ou no health check restauram automaticamente a versão anterior. O serviço n8n é apenas verificado e nunca é reiniciado pelo pipeline.
+O servidor valida origem, revisão, checksum e a nova versão em uma porta canário antes de trocar a release ativa. Falhas no restart ou no health check restauram automaticamente a versão anterior. O serviço n8n é apenas verificado e nunca é reiniciado pelo pipeline.
 
 Configuração, bootstrap e rollback estão documentados em [`docs/deployment.md`](docs/deployment.md).
 

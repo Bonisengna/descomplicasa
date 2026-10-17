@@ -21,7 +21,11 @@ case "$APP_SERVICE" in
 esac
 test -d "$APP_ROOT"
 test -L "$APP_ROOT/current"
-test -f "$APP_ROOT/current/server.js"
+if [ ! -f "$APP_ROOT/current/server.js" ] && [ ! -f "$APP_ROOT/current/.legacy-source" ]; then
+  echo "Current release has neither server.js nor a legacy source marker" >&2
+  exit 1
+fi
+test -f "$APP_ROOT/current/REVISION"
 "$SV_BIN" status "$APP_SERVICE" | grep '^run:' >/dev/null
 curl --fail --silent --show-error --max-time 10 "$CURRENT_HEALTH_URL" >/dev/null
 curl --fail --silent --show-error --max-time 10 "$N8N_HEALTH_URL" >/dev/null

@@ -46,6 +46,13 @@ jobs:
           NEXT_TELEMETRY_DISABLED: "1"
         run: npm run build
 
+      - name: Validate deployment shell scripts
+        run: |
+          set -euo pipefail
+          for script in ops/*.sh ops/runit/run ops/runit/log/run ops/runit/pull/run ops/runit/pull/log/run; do
+            sh -n "$script"
+          done
+
       - name: Assemble immutable release
         env:
           RELEASE_ID: ${{ github.sha }}

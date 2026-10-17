@@ -16,6 +16,7 @@ script_dir=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
 : "${RELEASE_API_URL:=https://api.github.com/repos/$GITHUB_REPOSITORY/releases/latest}"
 : "${DEPLOY_SCRIPT:=$script_dir/deploy-release.sh}"
 : "${PREFLIGHT_SCRIPT:=$script_dir/remote-check.sh}"
+: "${START_SCRIPT:=$script_dir/start-release.sh}"
 
 case "$APP_ROOT" in
   /*) ;;
@@ -36,6 +37,7 @@ case "$APP_SERVICE" in
 esac
 test -x "$DEPLOY_SCRIPT"
 test -x "$PREFLIGHT_SCRIPT"
+test -x "$START_SCRIPT"
 command -v curl >/dev/null
 command -v node >/dev/null
 command -v sha256sum >/dev/null
@@ -145,6 +147,7 @@ CURRENT_HEALTH_URL="$CURRENT_HEALTH_URL" \
 APP_HEALTH_URL="$APP_HEALTH_URL" \
 N8N_HEALTH_URL="$N8N_HEALTH_URL" \
 CANARY_PORT="$CANARY_PORT" \
+START_SCRIPT="$START_SCRIPT" \
 "$DEPLOY_SCRIPT" \
   "$inbox/descomplicaza.tar.gz" \
   "$inbox/descomplicaza.tar.gz.sha256" \

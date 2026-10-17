@@ -7,6 +7,8 @@ project_root=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
 test_root=$(mktemp -d)
 app_root="$test_root/descomplicaza"
 fake_bin="$test_root/bin"
+legacy_source="$test_root/legacy-source"
+config_file="$test_root/descomplicaza.env"
 prod_port=$((40000 + ($$ % 1000)))
 canary_port=$((41000 + ($$ % 1000)))
 n8n_port=$((42000 + ($$ % 1000)))
@@ -27,7 +29,22 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 mkdir -p "$app_root/releases/old" "$app_root/incoming" "$fake_bin"
-tar -xzf "$archive" -C "$app_root/releases/old"
+mkdir -p "$legacy_source/.next" "$legacy_source/node_modules/next/dist/bin"
+printf '{}\n' > "$legacy_source/package.json"
+printf 'legacy-build\n' > "$legacy_source/.next/BUILD_ID"
+cat > "$legacy_source/node_modules/next/dist/bin/next" <<'LEGACY_SERVER'
+const http = require("node:http");
+const args = process.argv.slice(2);
+const portIndex = args.indexOf("--port");
+const hostnameIndex = args.indexOf("--hostname");
+const port = Number(args[portIndex + 1]);
+const hostname = args[hostnameIndex + 1];
+http.createServer((request, response) => {
+  response.writeHead(request.url === "/" ? 200 : 404, { "content-type": "text/plain" });
+  response.end(request.url === "/" ? "legacy" : "not found");
+}).listen(port, hostname);
+LEGACY_SERVER
+printf '%s\n' "$legacy_source" > "$app_root/releases/old/.legacy-source"
 printf 'old\n' > "$app_root/releases/old/REVISION"
 ln -s "$app_root/releases/old" "$app_root/current"
 
@@ -58,8 +75,8 @@ case "$command" in
       exit 0
     fi
     (
-      cd "$release"
-      nohup env APP_REVISION="$revision" HOSTNAME=127.0.0.1 PORT="$TEST_PROD_PORT" node server.js \
+      nohup env DESCOMPLICAZA_ENV_FILE="$TEST_CONFIG_FILE" RELEASE_DIR="$release" \
+        START_HOSTNAME=127.0.0.1 START_PORT="$TEST_PROD_PORT" "$TEST_START_SCRIPT" \
         > "$TEST_LOG_FILE" 2>&1 &
       printf '%s\n' "$!" > "$TEST_PID_FILE"
     )
@@ -93,12 +110,31 @@ export HEALTHCHECK_ATTEMPTS=8
 export TEST_PID_FILE="$pid_file"
 export TEST_PROD_PORT="$prod_port"
 export TEST_LOG_FILE="$test_root/app.log"
+export TEST_CONFIG_FILE="$config_file"
+export TEST_START_SCRIPT="$project_root/ops/start-release.sh"
+export DESCOMPLICAZA_ENV_FILE="$config_file"
+export START_SCRIPT="$project_root/ops/start-release.sh"
+
+cat > "$config_file" <<EOF
+APP_ROOT=$app_root
+PORT=$prod_port
+HOSTNAME=127.0.0.1
+NODE_BIN='$(command -v node)'
+NODE_OPTIONS=--max-old-space-size=512
+APP_SERVICE=$APP_SERVICE
+SV_BIN=$SV_BIN
+START_SCRIPT=$START_SCRIPT
+CURRENT_HEALTH_URL=$CURRENT_HEALTH_URL
+APP_HEALTH_URL=$APP_HEALTH_URL
+N8N_HEALTH_URL=$N8N_HEALTH_URL
+CANARY_PORT=$CANARY_PORT
+EOF
 
 sv restart "$APP_SERVICE"
 
 attempt=0
 while [ "$attempt" -lt "$HEALTHCHECK_ATTEMPTS" ]; do
-  if curl --fail --silent --max-time 2 "$APP_HEALTH_URL" | grep -F '"revision":"old"' >/dev/null 2>&1 \
+  if curl --fail --silent --max-time 2 "$CURRENT_HEALTH_URL" | grep -F 'legacy' >/dev/null 2>&1 \
     && curl --fail --silent --max-time 2 "$N8N_HEALTH_URL" >/dev/null 2>&1; then
     break
   fi
@@ -132,7 +168,7 @@ stage_release new
 
 "$project_root/ops/rollback-release.sh"
 test "$(readlink -f "$app_root/current")" = "$app_root/releases/old"
-curl --fail --silent "$APP_HEALTH_URL" | grep -F '"revision":"old"' >/dev/null
+curl --fail --silent "$CURRENT_HEALTH_URL" | grep -F 'legacy' >/dev/null
 
 stage_release broken
 export TEST_FAIL_REVISION=broken
@@ -145,7 +181,7 @@ if "$project_root/ops/deploy-release.sh" \
 fi
 unset TEST_FAIL_REVISION
 test "$(readlink -f "$app_root/current")" = "$app_root/releases/old"
-curl --fail --silent "$APP_HEALTH_URL" | grep -F '"revision":"old"' >/dev/null
+curl --fail --silent "$CURRENT_HEALTH_URL" | grep -F 'legacy' >/dev/null
 curl --fail --silent "$N8N_HEALTH_URL" >/dev/null
 
 printf 'Release script integration tests passed.\n'

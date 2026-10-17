@@ -1,20 +1,5 @@
-#!/bin/sh
-set -eu
+#!/data/data/com.termux/files/usr/bin/sh
+exec 2>&1
 
-config_file=${DESCOMPLICAZA_ENV_FILE:-/etc/descomplicaza.env}
-test -r "$config_file"
-
-# This file is controlled by the server administrator, not by the release.
-. "$config_file"
-
-: "${APP_ROOT:?APP_ROOT is required}"
-: "${PORT:=3000}"
-: "${HOSTNAME:=127.0.0.1}"
-
-release=$(readlink -f "$APP_ROOT/current")
-test -f "$release/server.js"
-APP_REVISION=$(cat "$release/REVISION")
-export APP_REVISION PORT HOSTNAME NODE_ENV=production NEXT_TELEMETRY_DISABLED=1
-
-cd "$release"
-exec node server.js
+exec proot-distro login debian \
+  -- /usr/local/bin/descomplicaza-start

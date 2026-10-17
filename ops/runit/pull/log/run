@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/data/data/com.termux/files/usr/bin/sh
 set -eu
 
-log_dir=${DESCOMPLICAZA_PULL_LOG_DIR:-/var/log/descomplicaza-pull}
+log_dir=${DESCOMPLICAZA_PULL_LOG_DIR:-/data/data/com.termux/files/usr/var/log/descomplicaza-pull}
 mkdir -p "$log_dir"
-exec svlogd -tt "$log_dir"
+exec /data/data/com.termux/files/usr/bin/svlogd -tt "$log_dir"

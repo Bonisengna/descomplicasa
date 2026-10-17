@@ -16,6 +16,8 @@ release_id=${3:?release id is required}
 : "${CANARY_PORT:=3100}"
 : "${KEEP_RELEASES:=5}"
 : "${HEALTHCHECK_ATTEMPTS:=45}"
+script_dir=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
+: "${START_SCRIPT:=$script_dir/start-release.sh}"
 
 case "$APP_ROOT" in
   /*) ;;
@@ -48,6 +50,7 @@ case "$SV_BIN" in
   */*) test -x "$SV_BIN" ;;
   *) command -v "$SV_BIN" >/dev/null ;;
 esac
+test -x "$START_SCRIPT"
 
 releases_dir="$APP_ROOT/releases"
 release_dir="$releases_dir/$release_id"
@@ -163,10 +166,9 @@ test -d "$candidate_dir/.next/static"
 test -d "$candidate_dir/public"
 test "$(cat "$candidate_dir/REVISION")" = "$release_id"
 
-(
-  cd "$candidate_dir"
-  APP_REVISION="$release_id" HOSTNAME=127.0.0.1 PORT="$CANARY_PORT" node server.js
-) > "$candidate_dir/canary.log" 2>&1 &
+DESCOMPLICAZA_ENV_FILE=${DESCOMPLICAZA_ENV_FILE:-/etc/descomplicaza.env} \
+RELEASE_DIR="$candidate_dir" START_HOSTNAME=127.0.0.1 START_PORT="$CANARY_PORT" \
+  "$START_SCRIPT" > "$candidate_dir/canary.log" 2>&1 &
 canary_pid=$!
 
 if ! wait_for_revision "http://127.0.0.1:$CANARY_PORT/api/health" "$release_id" "$HEALTHCHECK_ATTEMPTS"; then

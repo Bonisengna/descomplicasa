@@ -24,9 +24,11 @@ Os scripts de controle devem ficar em um diretório administrativo que uma relea
 /usr/local/lib/descomplicaza-deploy/
   deploy-release.sh
   parse-release.mjs
+  pull-loop.sh
   pull-release.sh
   remote-check.sh
   rollback-release.sh
+  start-release.sh
 ```
 
 A configuração também fica fora da aplicação, normalmente em `/etc/descomplicaza.env`. Um exemplo está em `ops/descomplicaza.env.example`.
@@ -34,8 +36,10 @@ A configuração também fica fora da aplicação, normalmente em `/etc/descompl
 | Variável | Padrão ou exemplo | Finalidade |
 | --- | --- | --- |
 | `APP_ROOT` | `/srv/descomplicaza` | Diretório exclusivo das releases |
-| `APP_SERVICE` | `descomplicaza` | Nome ou caminho completo do serviço runit |
-| `SV_BIN` | `sv` | Comando `sv`; pode apontar para o binário do Termux |
+| `APP_SERVICE` | `/data/data/com.termux/files/usr/var/service/descomplicaza` | Caminho do serviço runit do Termux |
+| `SV_BIN` | `/data/data/com.termux/files/usr/bin/sv` | Binário `sv` do Termux, visível dentro do Debian |
+| `START_SCRIPT` | `/usr/local/bin/descomplicaza-start` | Inicializador único para releases novas e para o build legado |
+| `NODE_BIN` | `/usr/local/bin/node` | Node.js ARM64 usado dentro do Debian |
 | `CURRENT_HEALTH_URL` | `http://127.0.0.1:3000/` | Saúde compatível com o site que já está no ar |
 | `APP_HEALTH_URL` | `http://127.0.0.1:3000/api/health` | Saúde versionada das novas releases |
 | `N8N_HEALTH_URL` | `http://127.0.0.1:5678/healthz` | Trava de saúde do n8n |
@@ -46,36 +50,63 @@ A configuração também fica fora da aplicação, normalmente em `/etc/descompl
 
 ## Bootstrap único
 
-O bootstrap não deve ser executado até confirmar os caminhos reais usados pelo Termux/PRoot e pelo serviço já existente. Ele é a única etapa manual porque precisa registrar a versão atualmente no ar como primeira release, sem sobrescrevê-la.
+Os caminhos reais já confirmados são:
 
-Antes de ativar o buscador:
+- aplicação atual: `/opt/descomplicaza/descomplicasa`;
+- inicializador no Debian: `/usr/local/bin/descomplicaza-start`;
+- serviço externo: `/data/data/com.termux/files/usr/var/service/descomplicaza`;
+- controle runit: `/data/data/com.termux/files/usr/bin/sv`;
+- Node.js: `/usr/local/bin/node`.
 
-1. Descobrir o arquivo `run` real do serviço `descomplicaza`, o diretório onde a aplicação atual está instalada e como o `sv` do Termux pode ser chamado a partir do Debian.
-2. Copiar os scripts administrativos e a configuração para dentro do Debian, com escrita restrita ao administrador.
-3. Registrar o build atual em `APP_ROOT/releases/<revisao-atual>` e criar os links `current` e `previous`.
-4. Validar manualmente o site atual em `/`, o `/healthz` do n8n e o controle do serviço externo sem reiniciá-lo. A rota `/api/health` é exigida somente das novas releases.
-5. Executar `pull-release.sh` uma vez manualmente. Somente após esse teste instalar e iniciar o serviço runit `descomplicaza-pull`.
+Copie a pasta `ops` da revisão aprovada para um diretório temporário no Debian e, como `root` dentro do Debian, execute:
 
-O template do buscador está em `ops/runit/pull/run`. Ele continua tentando após erros de rede ou de validação; qualquer falha preserva a versão que já está no ar.
+```sh
+cd /caminho/temporario/ops
+LEGACY_REVISION="$(git -C /opt/descomplicaza/descomplicasa rev-parse HEAD)" \
+  ./bootstrap-termux-proot.sh
+```
+
+O bootstrap:
+
+1. confirma que o site atual, o n8n e o runit estão saudáveis;
+2. registra o diretório atual como rollback legado, sem copiar ou limpar `.next`, `node_modules` ou arquivos modificados;
+3. instala a configuração e os scripts administrativos;
+4. testa o inicializador novo na porta 3100;
+5. instala `descomplicaza-pull` no runit do Termux com um arquivo `down`, portanto ainda desativado;
+6. confirma novamente a saúde do site e do n8n sem reiniciar o processo que está no ar.
+
+Se o telefone reiniciar depois desse bootstrap, o inicializador novo ainda consegue abrir o build legado. O arquivo anterior também fica salvo como `/usr/local/bin/descomplicaza-start.pre-cicd`.
+
+O buscador só deve ser ativado depois do primeiro teste manual. Qualquer falha de rede ou validação preserva a versão que já está no ar.
 
 ## Consulta manual
 
 Para procurar e instalar uma nova versão sem esperar os 30 dias:
 
+No Termux:
+
 ```sh
-. /etc/descomplicaza.env
-/usr/local/lib/descomplicaza-deploy/pull-release.sh
+proot-distro login debian -- sh -lc \
+  '. /etc/descomplicaza.env && /usr/local/lib/descomplicaza-deploy/pull-release.sh'
+```
+
+Depois de conferir o site e o n8n, ative a verificação automática de 30 dias no Termux:
+
+```sh
+rm /data/data/com.termux/files/usr/var/service/descomplicaza-pull/down
+sv up /data/data/com.termux/files/usr/var/service/descomplicaza-pull
+sv status /data/data/com.termux/files/usr/var/service/descomplicaza-pull
 ```
 
 Se uma consulta automática já estiver em andamento, o comando manual termina sem iniciar um segundo deploy. Depois que o serviço runit estiver instalado, reiniciá-lo também força uma consulta imediata:
 
 ```sh
-sv restart descomplicaza-pull
+sv restart /data/data/com.termux/files/usr/var/service/descomplicaza-pull
 ```
 
 ## Rollback
 
-No telefone, sem depender do GitHub:
+Dentro do Debian, sem depender do GitHub:
 
 ```sh
 . /etc/descomplicaza.env
@@ -93,7 +124,7 @@ O rollback também passa pela porta canário e restaura a versão original se su
 
 ## Tailscale
 
-O Tailscale continua útil para administração manual por SSH na porta 8022, mas não participa do deploy automático. As variáveis `TS_OAUTH_CLIENT_ID` e `TS_AUDIENCE` já cadastradas no ambiente `production` podem permanecer sem uso; o workflow não as lê. Elas podem ser removidas depois que este modelo estiver validado.
+O Tailscale continua útil para chegar ao endereço privado do telefone e administrar o OpenSSH do Termux na porta 8022, mas não participa do deploy automático. O comando `tailscale` não precisa existir dentro do Termux ou do Debian para este modelo funcionar. As variáveis `TS_OAUTH_CLIENT_ID` e `TS_AUDIENCE` não são lidas pelo workflow e podem ser removidas depois que este modelo estiver validado.
 
 ## Proteções recomendadas no GitHub
 
