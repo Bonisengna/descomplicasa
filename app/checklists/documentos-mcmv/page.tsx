@@ -72,12 +72,6 @@ export default function McmvDocumentsPage() {
         <div className="container">Conteúdo informativo. A relação final de documentos é definida pela instituição financeira e pode mudar conforme o perfil da operação.</div>
       </section>
 
-      <footer className="footer">
-        <div className="container footer-inner">
-          <a className="footer-brand" href="/"><span className="brand-dot" /> DESCOMPLICASA</a>
-          <p>© 2026 Descomplicasa.</p>
-        </div>
-      </footer>
     </main>
   );
 }

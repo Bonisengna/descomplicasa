@@ -111,12 +111,6 @@ export default function McmvBandPage() {
         </div>
       </section>
 
-      <footer className="footer">
-        <div className="container footer-inner">
-          <a className="footer-brand" href="/"><span className="brand-dot" /> DESCOMPLICASA</a>
-          <p>© 2026 Descomplicasa.</p>
-        </div>
-      </footer>
 
       <script
         type="application/ld+json"

@@ -73,15 +73,6 @@
   font-size: 15px;
 }
 
-.footer p {
-  font-size: 0;
-}
-
-.footer p::before {
-  content: "© 2026 DescompliCAZA.";
-  font-size: 11px;
-}
-
 @media (max-width: 520px) {
   .brand-wordmark {
     font-size: 19px;

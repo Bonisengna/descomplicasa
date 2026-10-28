@@ -255,12 +255,6 @@ export default function ItbiGuidePage() {
         <div className="container">Conteúdo informativo. Regras de ITBI variam por município e podem envolver particularidades tributárias e registrais. Confirme a legislação vigente antes do pagamento.</div>
       </section>
 
-      <footer className="footer">
-        <div className="container footer-inner">
-          <a className="footer-brand" href="/">DescompliCAZA</a>
-          <p>© 2026 DescompliCAZA.</p>
-        </div>
-      </footer>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
     </main>

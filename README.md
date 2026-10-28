@@ -77,7 +77,8 @@ Home
 │   ├── FGTS
 │   ├── ITBI
 │   └── conteúdos editoriais
-└── Blog
+├── Blog
+└── Política de Privacidade
 ```
 
 ## Calculadoras disponíveis
@@ -374,6 +375,12 @@ Calculadora de ITBI
 
 Essa arquitetura é importante para SEO, tempo de permanência, navegação interna e conversão.
 
+## Política de Privacidade
+
+Rota: `/politica-de-privacidade`
+
+Apresenta a política do aplicativo interno `n8n Descomplicasa`, incluindo dados acessados, finalidade de uso, armazenamento, revogação de acesso e contato. O acesso à página fica disponível no rodapé compartilhado de todas as rotas.
+
 ## SEO e conteúdo
 
 As páginas editoriais utilizam títulos e descrições voltados para intenção de busca.
@@ -450,6 +457,7 @@ app/
 │   └── itbi/
 ├── checklists/
 │   └── documentos-mcmv/
+├── politica-de-privacidade/
 ├── guias/
 │   ├── como-juntar-entrada-imovel/
 │   ├── fgts/
@@ -466,8 +474,8 @@ app/
 └── spacing.css
 
 components/
-├── SiteHeader.tsx
-└── SiteFooter.tsx
+├── Header.tsx
+└── Footer.tsx
 
 docs/
 └── amortizacao-context.md

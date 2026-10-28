@@ -248,12 +248,6 @@ export default function FgtsGuidePage() {
         <div className="container">Conteúdo informativo. Não substitui análise da instituição financeira nem a verificação das regras vigentes do FGTS para comprador, imóvel e operação.</div>
       </section>
 
-      <footer className="footer">
-        <div className="container footer-inner">
-          <a className="footer-brand" href="/"><span className="brand-dot" /> DESCOMPLICASA</a>
-          <p>© 2026 Descomplicasa.</p>
-        </div>
-      </footer>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
     </main>

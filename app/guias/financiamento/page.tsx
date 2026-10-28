@@ -294,12 +294,6 @@ export default function FinancingGuidePage() {
         <div className="container">Conteúdo informativo. Não constitui proposta de crédito nem substitui análise bancária, jurídica, registral ou financeira individual. Condições variam conforme instituição, perfil, imóvel e linha contratada.</div>
       </section>
 
-      <footer className="footer">
-        <div className="container footer-inner">
-          <a className="footer-brand" href="/"><span className="brand-dot" /> DESCOMPLICASA</a>
-          <p>© 2026 Descomplicasa.</p>
-        </div>
-      </footer>
 
       <script
         type="application/ld+json"

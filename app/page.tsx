@@ -86,7 +86,6 @@ export default function Home() {
 
       <section className="about-section" id="sobre"><div className="container about-grid"><div><span className="kicker">Por que existe</span><h2>Comprar um imóvel tem muita informação espalhada.</h2></div><div><p>O DescompliCAZA nasce para reunir ferramentas e conteúdo em uma experiência simples: calcular, conferir e entender antes de decidir.</p><p className="about-disclaimer">O conteúdo tem caráter informativo e não substitui análise jurídica, registral, bancária ou técnica quando necessária.</p></div></div></section>
       <section className="final-cta"><div className="container final-cta-inner"><div><span className="brand-inline"><span className="brand-dot" /> DescompliCAZA</span><h2>Tudo o que você precisa entender antes de comprar um imóvel.</h2></div><a className="button button-light" href="/calculadoras/financiamento">Simular financiamento <ArrowIcon /></a></div></section>
-      <footer className="footer"><div className="container footer-inner"><a className="footer-brand" href="#top"><span className="brand-dot" /> DescompliCAZA</a><p>© 2026 DescompliCAZA.</p></div></footer>
     </main>
   );
 }

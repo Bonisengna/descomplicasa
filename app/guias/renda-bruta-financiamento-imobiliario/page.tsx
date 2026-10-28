@@ -213,12 +213,6 @@ export default function GrossIncomeArticle() {
         <div className="container">Conteúdo informativo. Não constitui aconselhamento financeiro nem substitui a análise individual do orçamento ou da instituição financeira.</div>
       </section>
 
-      <footer className="footer">
-        <div className="container footer-inner">
-          <a className="footer-brand" href="/"><span className="brand-dot" /> DESCOMPLICASA</a>
-          <p>© 2026 Descomplicasa.</p>
-        </div>
-      </footer>
 
       <script
         type="application/ld+json"

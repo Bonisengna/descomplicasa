@@ -167,12 +167,6 @@ export default function EntrySavingsArticle() {
         <div className="container">Conteúdo informativo e de planejamento. Não constitui recomendação financeira individual, aprovação de crédito ou garantia de uso do FGTS.</div>
       </section>
 
-      <footer className="footer">
-        <div className="container footer-inner">
-          <a className="footer-brand" href="/"><span className="brand-dot" /> DescompliCAZA</a>
-          <p>© 2026 DescompliCAZA.</p>
-        </div>
-      </footer>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
     </main>

@@ -226,12 +226,6 @@ export default function McmvGuidePage() {
         <div className="container">Conteúdo informativo. Não substitui análise bancária, jurídica, registral ou contratual. Regras, taxas e limites podem ser alterados pelos órgãos responsáveis.</div>
       </section>
 
-      <footer className="footer">
-        <div className="container footer-inner">
-          <a className="footer-brand" href="/"><span className="brand-dot" /> DESCOMPLICASA</a>
-          <p>© 2026 Descomplicasa.</p>
-        </div>
-      </footer>
     </main>
   );
 }

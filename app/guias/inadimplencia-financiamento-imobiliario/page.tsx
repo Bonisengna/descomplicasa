@@ -203,12 +203,6 @@ export default function MortgageDelinquencyArticle() {
         <div className="container">Conteúdo informativo e educacional. Não constitui aconselhamento financeiro, jurídico ou recomendação individual de crédito.</div>
       </section>
 
-      <footer className="footer">
-        <div className="container footer-inner">
-          <a className="footer-brand" href="/"><span className="brand-dot" /> DESCOMPLICASA</a>
-          <p>© 2026 Descomplicasa.</p>
-        </div>
-      </footer>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
     </main>
