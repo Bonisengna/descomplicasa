@@ -379,7 +379,7 @@ Essa arquitetura é importante para SEO, tempo de permanência, navegação inte
 
 Rota: `/politica-de-privacidade`
 
-Apresenta a política do aplicativo interno `n8n Descomplicasa`, incluindo dados acessados, finalidade de uso, armazenamento, revogação de acesso e contato. O acesso à página fica disponível no rodapé compartilhado de todas as rotas.
+Apresenta como a DescompliCAZA trata dados no site, nos canais de contato e no aplicativo interno `n8n Descomplicaza`. A página informa o processamento local das calculadoras e checklists, os registros técnicos mínimos, as práticas atuais de cookies, o uso de APIs do Google, retenção, compartilhamento, direitos previstos na LGPD, revogação de acesso e contato. O acesso à página fica disponível no rodapé compartilhado de todas as rotas.
 
 ## SEO e conteúdo
 
