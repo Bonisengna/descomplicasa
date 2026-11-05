@@ -64,13 +64,16 @@ case "$command" in
     printf 'down: %s\n' "$service" >&2
     exit 1
     ;;
-  restart)
+  restart|force-restart)
+    release=$(readlink -f "$APP_ROOT/current")
+    revision=$(cat "$release/REVISION")
+    if [ "$command" = restart ] && [ "${TEST_REQUIRE_FORCE_RESTART_REVISION:-}" = "$revision" ]; then
+      exit 1
+    fi
     if [ -f "$TEST_PID_FILE" ]; then
       kill "$(cat "$TEST_PID_FILE")" 2>/dev/null || true
       rm -f "$TEST_PID_FILE"
     fi
-    release=$(readlink -f "$APP_ROOT/current")
-    revision=$(cat "$release/REVISION")
     if [ "${TEST_FAIL_REVISION:-}" = "$revision" ]; then
       exit 0
     fi
@@ -157,6 +160,7 @@ stage_release() {
 }
 
 stage_release new
+export TEST_REQUIRE_FORCE_RESTART_REVISION=new
 "$project_root/ops/deploy-release.sh" \
   "$app_root/incoming/new/descomplicaza.tar.gz" \
   "$app_root/incoming/new/descomplicaza.tar.gz.sha256" \

@@ -94,6 +94,15 @@ wait_for_http() {
   return 1
 }
 
+restart_service() {
+  if "$SV_BIN" restart "$APP_SERVICE"; then
+    return 0
+  fi
+
+  echo "Graceful service restart timed out; forcing restart of the application service." >&2
+  "$SV_BIN" force-restart "$APP_SERVICE"
+}
+
 restore_previous() {
   old_target=$1
   old_previous=${2:-}
@@ -108,7 +117,7 @@ restore_previous() {
     else
       rm -f "$previous_link"
     fi
-    "$SV_BIN" restart "$APP_SERVICE" || true
+    restart_service || true
     if ! wait_for_http "$CURRENT_HEALTH_URL" "$HEALTHCHECK_ATTEMPTS"; then
       echo "WARNING: previous release did not recover its health check" >&2
     fi
@@ -205,7 +214,7 @@ previous_replacement="$APP_ROOT/.previous-$release_id-$$"
 ln -s "$old_target" "$previous_replacement"
 mv -Tf "$previous_replacement" "$previous_link"
 
-if ! "$SV_BIN" restart "$APP_SERVICE"; then
+if ! restart_service; then
   restore_previous "$old_target" "$old_previous"
   echo "Service restart failed; previous release restored" >&2
   exit 1

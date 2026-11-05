@@ -11,7 +11,7 @@ O GitHub não abre uma conexão com o telefone. Não há senha, chave SSH, token
 3. O serviço `descomplicaza-pull` no telefone lê apenas a Release de produção mais recente.
 4. O telefone exige que a tag, o commit e as URLs dos dois arquivos correspondam exatamente a `Bonisengna/descomplicasa`.
 5. O pacote é baixado para um diretório temporário e seu SHA-256 é conferido.
-6. `deploy-release.sh` testa a revisão em `127.0.0.1:3100`; somente depois troca o link `current` e reinicia `descomplicaza`.
+6. `deploy-release.sh` testa a revisão em `127.0.0.1:3100`; somente depois troca o link `current` e reinicia `descomplicaza`. Se o PRoot não encerrar no prazo do restart gracioso, o script força o restart apenas desse serviço de aplicação.
 7. Se o novo site não ficar saudável, o link anterior é restaurado automaticamente.
 
 O n8n nunca é reiniciado, atualizado ou reconfigurado por esses scripts. Seu `/healthz` funciona apenas como trava de segurança antes e depois da troca.

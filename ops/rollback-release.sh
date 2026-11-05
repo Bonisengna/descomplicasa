@@ -100,11 +100,20 @@ wait_for_http() {
   return 1
 }
 
+restart_service() {
+  if "$SV_BIN" restart "$APP_SERVICE"; then
+    return 0
+  fi
+
+  echo "Graceful service restart timed out; forcing restart of the application service." >&2
+  "$SV_BIN" force-restart "$APP_SERVICE"
+}
+
 restore_original() {
   failed="$APP_ROOT/.current-failed-rollback-$$"
   ln -s "$old_target" "$failed"
   mv -Tf "$failed" "$APP_ROOT/current"
-  "$SV_BIN" restart "$APP_SERVICE" || true
+  restart_service || true
   if [ -f "$old_target/.legacy-source" ]; then
     wait_for_http "$CURRENT_HEALTH_URL" "$HEALTHCHECK_ATTEMPTS" || true
   else
@@ -149,7 +158,7 @@ replacement="$APP_ROOT/.current-rollback-$$"
 ln -s "$target" "$replacement"
 mv -Tf "$replacement" "$APP_ROOT/current"
 
-if ! "$SV_BIN" restart "$APP_SERVICE"; then
+if ! restart_service; then
   restore_original
   exit 1
 fi
