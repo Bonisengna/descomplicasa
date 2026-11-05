@@ -83,6 +83,9 @@ case "$command" in
         > "$TEST_LOG_FILE" 2>&1 &
       printf '%s\n' "$!" > "$TEST_PID_FILE"
     )
+    if [ "$command" = force-restart ] && [ "${TEST_FORCE_RESTART_NONZERO_REVISION:-}" = "$revision" ]; then
+      exit 1
+    fi
     ;;
   *)
     echo "Unsupported fake sv command: $command" >&2
@@ -161,6 +164,7 @@ stage_release() {
 
 stage_release new
 export TEST_REQUIRE_FORCE_RESTART_REVISION=new
+export TEST_FORCE_RESTART_NONZERO_REVISION=new
 "$project_root/ops/deploy-release.sh" \
   "$app_root/incoming/new/descomplicaza.tar.gz" \
   "$app_root/incoming/new/descomplicaza.tar.gz.sha256" \

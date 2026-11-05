@@ -100,7 +100,12 @@ restart_service() {
   fi
 
   echo "Graceful service restart timed out; forcing restart of the application service." >&2
-  "$SV_BIN" force-restart "$APP_SERVICE"
+  if "$SV_BIN" force-restart "$APP_SERVICE"; then
+    return 0
+  fi
+
+  echo "Forced restart reported a non-zero status; verifying the supervised process." >&2
+  "$SV_BIN" status "$APP_SERVICE" | grep '^run:' >/dev/null
 }
 
 restore_previous() {
