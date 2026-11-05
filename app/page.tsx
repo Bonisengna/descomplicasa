@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import {
   ArrowIcon,
@@ -12,6 +13,10 @@ import {
   ShieldIcon,
   StampIcon,
 } from "@/components/Icons";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 const calculators = [
   { title: "Financiamento", text: "Descubra quanto pode financiar e tenha uma noção das parcelas.", Icon: CalculatorIcon, href: "/calculadoras/financiamento" },

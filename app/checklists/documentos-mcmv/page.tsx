@@ -4,6 +4,7 @@ import { McmvDocumentChecklist } from "./McmvDocumentChecklist";
 import styles from "./documentos-mcmv.module.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/checklists/documentos-mcmv" },
   title: "Checklist de documentos MCMV | Descomplicasa",
   description: "Veja os principais documentos para preparar antes de solicitar um financiamento pelo Minha Casa Minha Vida.",
 };

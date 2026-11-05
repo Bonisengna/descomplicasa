@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import styles from "./mcmv.module.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/guias/minha-casa-minha-vida" },
   title: "Minha Casa Minha Vida 2026 | Descomplicasa",
   description: "Entenda as faixas de renda, subsídios, juros, limites de imóvel e como usar o FGTS no Minha Casa Minha Vida em 2026.",
 };

@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import styles from "../inadimplencia-financiamento-imobiliario/article.module.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/guias/sac-ou-price-qual-melhor" },
   title: "SAC ou Price: qual é melhor no financiamento imobiliário? | DescompliCAZA",
   description: "Entenda a diferença entre SAC e Price e veja qual sistema tende a fazer mais sentido com entrada maior ou menor, renda alta ou orçamento apertado.",
 };

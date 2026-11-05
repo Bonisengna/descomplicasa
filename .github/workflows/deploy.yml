@@ -44,6 +44,8 @@ jobs:
       - name: Build the standalone application
         env:
           NEXT_TELEMETRY_DISABLED: "1"
+          SITE_URL: ${{ vars.SITE_URL || 'https://descomplicaza.caza85imoveis.com.br' }}
+          GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
         run: npm run build
 
       - name: Validate deployment shell scripts

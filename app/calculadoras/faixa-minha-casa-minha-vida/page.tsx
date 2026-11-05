@@ -4,6 +4,7 @@ import { McmvBandCalculator } from "./McmvBandCalculator";
 import styles from "./faixa-mcmv.module.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/calculadoras/faixa-minha-casa-minha-vida" },
   title: "Calculadora de Faixa MCMV 2026 | Descomplicasa",
   description:
     "Digite sua renda familiar e descubra sua faixa do Minha Casa Minha Vida em 2026, juros aproximados, possibilidade de subsídio e limite do imóvel.",

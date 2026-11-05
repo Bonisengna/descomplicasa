@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { Footer } from "@/components/Footer";
+import { siteUrl } from "@/lib/site";
 import "./globals.css";
 import "./brand.css";
 import "./spacing.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "DescompliCAZA | Entenda antes de comprar um imóvel",
     template: "%s | DescompliCAZA",
@@ -26,11 +28,19 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pt_BR",
     siteName: "DescompliCAZA",
+    url: siteUrl,
   },
   robots: {
     index: true,
     follow: true,
   },
+  ...(process.env.GOOGLE_SITE_VERIFICATION
+    ? {
+        verification: {
+          google: process.env.GOOGLE_SITE_VERIFICATION,
+        },
+      }
+    : {}),
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

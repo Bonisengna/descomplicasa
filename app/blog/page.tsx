@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import styles from "./blog.module.css";
 
-export const metadata: Metadata = { title: "Blog | DescompliCAZA", description: "Conteúdo prático sobre financiamento, compra de imóveis, Minha Casa Minha Vida, documentos e planejamento financeiro." };
+export const metadata: Metadata = {
+  title: "Blog | DescompliCAZA",
+  description: "Conteúdo prático sobre financiamento, compra de imóveis, Minha Casa Minha Vida, documentos e planejamento financeiro.",
+  alternates: { canonical: "/blog" },
+};
 
 const articles = [
   { category:"Financiamento", date:"11 de agosto de 2026", dateTime:"2026-08-11", title:"SAC ou Price: qual é melhor no financiamento imobiliário?", description:"Veja como entrada, renda, prazo e estratégia de amortização mudam a escolha entre SAC e Price — e por que a menor parcela inicial nem sempre significa o melhor financiamento.", href:"/guias/sac-ou-price-qual-melhor", featured:true },

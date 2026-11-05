@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import styles from "../minha-casa-minha-vida/mcmv.module.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/guias/financiamento" },
   title: "Financiamento imobiliário: guia completo para comprar imóvel | Descomplicasa",
   description:
     "Entenda como funciona o financiamento imobiliário, entrada, prazo, juros, CET, SAC e Price, análise de crédito, custos e etapas até a assinatura.",

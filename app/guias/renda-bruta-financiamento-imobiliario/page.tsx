@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import styles from "../inadimplencia-financiamento-imobiliario/article.module.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/guias/renda-bruta-financiamento-imobiliario" },
   title: "Renda bruta no financiamento imobiliário: por que o banco usa? | Descomplicasa",
   description:
     "Entenda por que os bancos consideram a renda bruta no financiamento imobiliário, onde esse critério faz sentido e por que ele não basta para saber se a parcela cabe no orçamento.",

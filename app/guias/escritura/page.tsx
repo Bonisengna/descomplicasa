@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import styles from "../minha-casa-minha-vida/mcmv.module.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/guias/escritura" },
   title: "Escritura de imóvel: quando é necessária e quanto custa | DescompliCAZA",
   description:
     "Entenda quando a escritura pública é necessária, quando o contrato de financiamento pode substituí-la, diferença para registro, custos, documentos e etapas da compra.",

@@ -4,6 +4,7 @@ import { AmortizationSimulator } from "./AmortizationSimulator";
 import styles from "./amortizacao.module.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/calculadoras/amortizacao" },
   title: "Simulador de amortização de financiamento | DescompliCAZA",
   description:
     "Simule aporte imediato, aporte anual e uso periódico do FGTS no financiamento imobiliário e veja a redução estimada de prazo, parcela e juros.",

@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import styles from "./privacy.module.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/politica-de-privacidade" },
   title: "Política de Privacidade",
   description:
     "Saiba como a DescompliCAZA trata dados no site, nas calculadoras e em suas automações internas.",

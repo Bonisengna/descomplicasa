@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import styles from "./article.module.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/guias/inadimplencia-financiamento-imobiliario" },
   title: "Inadimplência no financiamento imobiliário: causas e como evitar | Descomplicasa",
   description:
     "Entenda por que a inadimplência no crédito imobiliário voltou a subir em 2026, o que isso muda para quem financia e como reduzir o risco de atraso.",

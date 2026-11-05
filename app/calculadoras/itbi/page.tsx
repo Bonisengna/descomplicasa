@@ -4,6 +4,7 @@ import { ItbiCalculator } from "./ItbiCalculator";
 import styles from "./itbi.module.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/calculadoras/itbi" },
   title: "Calculadora de ITBI | DescompliCAZA",
   description: "Estime o ITBI conforme o município, valor do imóvel e forma de pagamento. Regras iniciais verificadas para Porto Alegre e São Leopoldo.",
 };

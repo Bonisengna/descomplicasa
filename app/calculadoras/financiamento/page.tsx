@@ -5,6 +5,7 @@ import { BankSimulators } from "./BankSimulators";
 import styles from "./financiamento.module.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/calculadoras/financiamento" },
   title: "Calculadora de Financiamento Imobiliário | Descomplicasa",
   description:
     "Simule um financiamento imobiliário com entrada, prazo, taxa de juros e sistemas SAC ou Price. Veja parcelas, saldo devedor mês a mês e custo total estimados.",

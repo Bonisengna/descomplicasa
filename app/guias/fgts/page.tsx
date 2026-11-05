@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import styles from "../minha-casa-minha-vida/mcmv.module.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/guias/fgts" },
   title: "FGTS na compra do imóvel: regras, app e Saque-Aniversário | Descomplicasa",
   description:
     "Veja como usar o FGTS na compra do imóvel, como consultar saldo e autorizar bancos no App FGTS e entenda o impacto do Saque-Aniversário e da antecipação.",

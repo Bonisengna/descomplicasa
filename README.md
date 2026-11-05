@@ -385,6 +385,16 @@ Apresenta como a DescompliCAZA trata dados no site, nos canais de contato e no a
 
 As páginas editoriais utilizam títulos e descrições voltados para intenção de busca.
 
+O SEO técnico usa os arquivos de metadata nativos do Next.js:
+
+- `/sitemap.xml` lista somente as rotas públicas e canônicas;
+- `/robots.txt` libera o site, exclui `/api/` do rastreamento e referencia o sitemap;
+- cada página pública declara canonical autorreferente;
+- `SITE_URL` define a origem canônica usada no build, com fallback para `https://descomplicaza.caza85imoveis.com.br`;
+- `GOOGLE_SITE_VERIFICATION` pode receber o token de verificação por meta tag do Google Search Console.
+
+No GitHub Actions, `SITE_URL` e `GOOGLE_SITE_VERIFICATION` podem ser definidos como variables do repositório. O domínio precisa resolver publicamente em HTTPS antes do envio de `/sitemap.xml` ao Google Search Console.
+
 Diretrizes adotadas:
 
 - uma intenção principal por página;

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Indexacao web e sitemaps"
+  short_description: "Prepara sites para descoberta e indexacao"
+  default_prompt: "Use $web-sitemap-indexing para preparar este site para rastreamento e indexacao no Google."

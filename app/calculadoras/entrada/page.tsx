@@ -4,6 +4,7 @@ import { EntryCalculator } from "./EntryCalculator";
 import styles from "./entrada.module.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/calculadoras/entrada" },
   title: "Calculadora de entrada de imóvel",
   description:
     "Calcule quanto você já tem disponível para a compra do imóvel e quanto ainda falta, considerando recursos próprios, FGTS, subsídio e financiamento estimado.",

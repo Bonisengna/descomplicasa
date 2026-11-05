@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import styles from "../minha-casa-minha-vida/mcmv.module.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/guias/itbi" },
   title: "ITBI: o que é, como calcular e quando pagar | DescompliCAZA",
   description:
     "Entenda o ITBI na compra do imóvel: quem cobra, como é calculado, por que a alíquota varia por município, base de cálculo, pagamento e cuidados com a guia.",

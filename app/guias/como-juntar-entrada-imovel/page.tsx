@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import styles from "../inadimplencia-financiamento-imobiliario/article.module.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/guias/como-juntar-entrada-imovel" },
   title: "Como juntar dinheiro para a entrada de um imóvel | DescompliCAZA",
   description:
     "Veja um plano prático para organizar a entrada do imóvel, definir uma meta mensal, usar FGTS quando elegível e não esquecer dos custos da compra.",
