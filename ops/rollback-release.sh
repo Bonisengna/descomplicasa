@@ -19,6 +19,9 @@ fi
 script_dir=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
 : "${START_SCRIPT:=$script_dir/start-release.sh}"
 
+export APP_ROOT APP_SERVICE SV_BIN CURRENT_HEALTH_URL APP_HEALTH_URL
+export N8N_HEALTH_URL CANARY_PORT START_SCRIPT
+
 case "$APP_ROOT" in
   /*) ;;
   *) echo "APP_ROOT must be absolute" >&2; exit 1 ;;
