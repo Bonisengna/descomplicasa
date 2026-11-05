@@ -1,6 +1,12 @@
 #!/bin/sh
 set -eu
 
+config_file=${DESCOMPLICAZA_ENV_FILE:-/etc/descomplicaza.env}
+if [ -r "$config_file" ]; then
+  # This file is controlled by the server administrator, not by a release.
+  . "$config_file"
+fi
+
 : "${APP_ROOT:?APP_ROOT is required}"
 : "${APP_SERVICE:=descomplicaza}"
 : "${SV_BIN:=sv}"

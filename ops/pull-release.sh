@@ -3,6 +3,12 @@ set -eu
 
 umask 077
 
+config_file=${DESCOMPLICAZA_ENV_FILE:-/etc/descomplicaza.env}
+if [ -r "$config_file" ]; then
+  # This file is controlled by the server administrator, not by a release.
+  . "$config_file"
+fi
+
 script_dir=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
 
 : "${APP_ROOT:?APP_ROOT is required}"
@@ -17,6 +23,9 @@ script_dir=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
 : "${DEPLOY_SCRIPT:=$script_dir/deploy-release.sh}"
 : "${PREFLIGHT_SCRIPT:=$script_dir/remote-check.sh}"
 : "${START_SCRIPT:=$script_dir/start-release.sh}"
+
+export APP_ROOT APP_SERVICE SV_BIN CURRENT_HEALTH_URL APP_HEALTH_URL
+export N8N_HEALTH_URL CANARY_PORT GITHUB_REPOSITORY START_SCRIPT
 
 case "$APP_ROOT" in
   /*) ;;

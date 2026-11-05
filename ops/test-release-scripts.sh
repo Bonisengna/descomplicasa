@@ -143,6 +143,10 @@ while [ "$attempt" -lt "$HEALTHCHECK_ATTEMPTS" ]; do
 done
 test "$attempt" -lt "$HEALTHCHECK_ATTEMPTS"
 "$project_root/ops/remote-check.sh"
+(
+  unset APP_ROOT APP_SERVICE SV_BIN CURRENT_HEALTH_URL APP_HEALTH_URL N8N_HEALTH_URL
+  "$project_root/ops/remote-check.sh"
+)
 
 stage_release() {
   release=$1
@@ -166,7 +170,10 @@ stage_release new
   "$app_root/incoming/new/descomplicaza.tar.gz.sha256" \
   new
 
-"$project_root/ops/rollback-release.sh"
+(
+  unset APP_ROOT APP_SERVICE SV_BIN CURRENT_HEALTH_URL APP_HEALTH_URL N8N_HEALTH_URL CANARY_PORT START_SCRIPT
+  "$project_root/ops/rollback-release.sh"
+)
 test "$(readlink -f "$app_root/current")" = "$app_root/releases/old"
 curl --fail --silent "$CURRENT_HEALTH_URL" | grep -F 'legacy' >/dev/null
 

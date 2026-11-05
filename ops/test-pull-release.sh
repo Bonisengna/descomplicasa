@@ -114,6 +114,18 @@ export TEST_FIXTURES="$test_root/fixtures"
 export TEST_CURL_LOG="$test_root/curl.log"
 export TEST_DEPLOY_LOG="$test_root/deploy.log"
 
+config_file="$test_root/descomplicaza.env"
+cat > "$config_file" <<EOF
+APP_ROOT=$app_root
+APP_SERVICE=descomplicaza
+GITHUB_REPOSITORY=Bonisengna/descomplicasa
+RELEASE_API_URL=https://api.github.test/latest
+PREFLIGHT_SCRIPT=$test_root/preflight.sh
+DEPLOY_SCRIPT=$test_root/deploy.sh
+EOF
+export DESCOMPLICAZA_ENV_FILE="$config_file"
+unset APP_ROOT APP_SERVICE GITHUB_REPOSITORY RELEASE_API_URL PREFLIGHT_SCRIPT DEPLOY_SCRIPT
+
 "$project_root/ops/pull-release.sh"
 test "$(cat "$TEST_DEPLOY_LOG")" = "$revision"
 test -f "$app_root/incoming/$revision/descomplicaza.tar.gz"
@@ -134,12 +146,14 @@ test "$(wc -l < "$TEST_DEPLOY_LOG")" -eq 1
 
 sed "s/\"target_commitish\": \"$revision\"/\"target_commitish\": \"ffffffffffffffffffffffffffffffffffffffff\"/" \
   "$test_root/fixtures/release.json" > "$test_root/fixtures/invalid-release.json"
-if node "$project_root/ops/parse-release.mjs" "$test_root/fixtures/invalid-release.json" "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+if node "$project_root/ops/parse-release.mjs" "$test_root/fixtures/invalid-release.json" "Bonisengna/descomplicasa" >/dev/null 2>&1; then
   echo "Mismatched release metadata unexpectedly passed validation" >&2
   exit 1
 fi
 
-if APP_SERVICE="$test_root/service/n8n" "$project_root/ops/pull-release.sh" >/dev/null 2>&1; then
+sed "s|APP_SERVICE=descomplicaza|APP_SERVICE=$test_root/service/n8n|" \
+  "$config_file" > "$test_root/n8n.env"
+if DESCOMPLICAZA_ENV_FILE="$test_root/n8n.env" "$project_root/ops/pull-release.sh" >/dev/null 2>&1; then
   echo "The pull deployer unexpectedly accepted the n8n service" >&2
   exit 1
 fi
