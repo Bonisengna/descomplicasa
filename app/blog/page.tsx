@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import styles from "./blog.module.css";
+import { mcmvArticles } from "@/lib/mcmv-articles";
 
 export const metadata: Metadata = {
   title: "Blog | DescompliCAZA",
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
 };
 
 const articles = [
+  ...mcmvArticles.map((article, index) => ({ category: "Minha Casa Minha Vida", date: "13 de novembro de 2026", dateTime: "2026-11-13", title: article.title, description: article.description, href: `/guias/${article.slug}`, featured: index === 0 })),
   { category:"Financiamento", date:"11 de agosto de 2026", dateTime:"2026-08-11", title:"SAC ou Price: qual é melhor no financiamento imobiliário?", description:"Veja como entrada, renda, prazo e estratégia de amortização mudam a escolha entre SAC e Price — e por que a menor parcela inicial nem sempre significa o melhor financiamento.", href:"/guias/sac-ou-price-qual-melhor", featured:true },
   { category:"Planejamento", date:"10 de agosto de 2026", dateTime:"2026-08-10", title:"Como juntar dinheiro para a entrada de um imóvel: um plano prático", description:"Descubra quanto falta, transforme a diferença em uma meta mensal e organize recursos próprios, FGTS e custos da compra sem perder o controle do orçamento.", href:"/guias/como-juntar-entrada-imovel", featured:false },
   { category:"Financiamento", date:"10 de agosto de 2026", dateTime:"2026-08-10", title:"Por que é considerada a renda bruta no financiamento imobiliário? Isso é correto?", description:"Entenda por que bancos usam a renda bruta, onde esse critério faz sentido e por que ele não basta para saber se a prestação realmente cabe no orçamento.", href:"/guias/renda-bruta-financiamento-imobiliario", featured:false },

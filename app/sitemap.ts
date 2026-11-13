@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { absoluteUrl } from "@/lib/site";
+import { mcmvArticles } from "@/lib/mcmv-articles";
 
 const publicRoutes = [
   "/",
@@ -23,7 +24,7 @@ const publicRoutes = [
 ] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return publicRoutes.map((route) => ({
+  return [...publicRoutes, ...mcmvArticles.map((article) => `/guias/${article.slug}`)].map((route) => ({
     url: absoluteUrl(route),
   }));
 }
