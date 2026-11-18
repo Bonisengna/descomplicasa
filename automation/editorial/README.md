@@ -1,6 +1,6 @@
 # Automação editorial com aprovação humana
 
-Estado: **templates locais inativos; integração com instância n8n e Telegram não executada**. Não confundir JSON sintaticamente válido com execução ao vivo homologada.
+Estado atual: **fluxos importados pelo MCP em modo prévia, com credenciais vinculadas e fallback OpenAI validado**. A aprovação por botão exige bot editorial dedicado, pois o bot atual pertence ao ArIA. Publicação continua bloqueada. Consulte [o registro da instalação](../../docs/editorial-mcp-installation.md) e os exports sanitizados em `mcp/`. O restante deste documento descreve o template inicial.
 
 ## Arquivos
 
