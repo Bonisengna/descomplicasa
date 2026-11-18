@@ -1,5 +1,18 @@
 # Instalação editorial na instância n8n
 
+## Teste de aprovação realizado em 18/11/2026
+
+Com o MCP ausente nesta sessão, o acesso ao painel foi autenticado pelo formulário seguro. Os prompts de redação e revisão foram ajustados para atribuir declarações, evitar extrapolações e exigir evidência concreta para reprovar o texto. O bloqueio de revisão permanece ativo.
+
+O teste 1575 enviou HTML com foto ao bot, mas foi cancelado antes da aprovação porque a IA havia alterado o endereço da fonte. O nó VALIDAR RASCUNHO agora usa diretamente a URL da fonte validada, sem reescrita pela IA. Três verificações isoladas passaram: resposta JSON como string, resposta como objeto e rejeição de fonte ausente.
+
+Uma nova execução concluiu produção, revisão final e envio do HTML com fotografia para Editorial_Bruno_Bot. A FILA confirmou revisão 2, título “Direcional explica causas do aumento dos distratos no Minha Casa Minha Vida”, etapa TELEGRAM e status AGUARDANDO_APROVACAO. O nó TELEGRAM - APROVAR OU REJEITAR mostrou Waiting for input; a prévia corrigida foi recebida pela API Telegram com ok=true (mensagem de documento 6). A decisão humana ainda não foi confirmada.
+
+Os botões são Publicar e Rejeitar, restritos ao aprovador configurado. A mensagem esclarece que esta homologação registra a aprovação editorial e que o envio ao site permanece bloqueado até concluir a integração. Nenhum artigo foi publicado.
+
+O fluxo de retomada também foi criado como rascunho: https://n8n.caza85imoveis.com.br/workflow/fss86c86EW4r8dsg . Seus 21 nós e SDK foram validados pelo MCP, mas a retomada não foi executada nem homologada com publicação real. As evidências anteriores de 31 testes locais não equivalem à homologação do site.
+
+
 Registro em 18/11/2026, America/Sao_Paulo. A melhoria está no [PR #4](https://github.com/Bonisengna/descomplicasa/pull/4), branch `feat/editorial-telegram-aprovacao`, acompanhada pela [issue #3](https://github.com/Bonisengna/descomplicasa/issues/3).
 
 | Fluxo | URL | Estado observado |
