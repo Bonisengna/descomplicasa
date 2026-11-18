@@ -1,5 +1,14 @@
 # Instalação editorial na instância n8n
 
+## Aprovação humana confirmada — execução 1576
+
+Em 18/11/2026 às 20:35 (America/Sao_Paulo), a revisão 2 recebeu aprovação pelo Telegram. A execução 1576 terminou como Succeeded: validou a decisão, preparou e salvou o snapshot aprovado na Data Table e registrou APROVADO na FILA.
+
+**O artigo não foi publicado por esse fluxo.** A execução terminou em PUBLICACAO CONFIGURADA, sem itens de saída. O nó PUBLICAR NO SITE não foi executado, pois publishEnabled permanece false. A FILA registra AGUARDANDO_IMPLANTACAO_SITE, public_url vazio e a pendência de implantação/autenticação do site. Sucesso da execução comprova a aprovação e seu registro, não a publicação.
+
+Para concluir, implantar a API e armazenamento persistente, configurar a credencial dedicada do publicador e homologar a retomada do mesmo snapshot aprovado. Não regenerar o artigo após a aprovação. Revalidar hashes e validade antes da tentativa de publicação; se a aprovação expirar, solicitar nova decisão.
+
+
 ## Teste de aprovação realizado em 18/11/2026
 
 Com o MCP ausente nesta sessão, o acesso ao painel foi autenticado pelo formulário seguro. Os prompts de redação e revisão foram ajustados para atribuir declarações, evitar extrapolações e exigir evidência concreta para reprovar o texto. O bloqueio de revisão permanece ativo.
