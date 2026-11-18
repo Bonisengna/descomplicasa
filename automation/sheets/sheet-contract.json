@@ -1,0 +1,73 @@
+{
+  "sheets": {
+    "FILA": [
+      "id",
+      "url_fonte",
+      "assunto",
+      "prioridade",
+      "acao",
+      "status",
+      "etapa",
+      "revisao",
+      "titulo_final",
+      "preview_url",
+      "imagem_url",
+      "imagem_credito",
+      "revisao_resultado",
+      "decisao",
+      "public_url",
+      "erro",
+      "atualizado_em"
+    ],
+    "CONFIG": [
+      "chave",
+      "valor",
+      "orientacao"
+    ],
+    "HISTORICO": [
+      "execucao_id",
+      "id",
+      "revisao",
+      "etapa",
+      "status",
+      "inicio",
+      "fim",
+      "tentativa",
+      "mensagem",
+      "public_url"
+    ]
+  },
+  "dropdowns": {
+    "prioridade": [
+      "BAIXA",
+      "NORMAL",
+      "ALTA"
+    ],
+    "acao": [
+      "PROCESSAR",
+      "PAUSAR",
+      "REPROCESSAR"
+    ],
+    "status": [
+      "NOVO",
+      "PESQUISANDO",
+      "REDIGINDO",
+      "SELECIONANDO_IMAGEM",
+      "REVISANDO",
+      "AGUARDANDO_APROVACAO",
+      "APROVADO",
+      "PUBLICANDO",
+      "PUBLICADO",
+      "REJEITADO",
+      "EXPIRADO",
+      "ERRO"
+    ],
+    "decisao": [
+      "PENDENTE",
+      "APROVAR",
+      "REJEITAR",
+      "EXPIRADO"
+    ]
+  },
+  "source": "https://www.moneytimes.com.br/nao-e-so-a-caixa-ceo-da-direcional-aponta-outro-motivo-por-tras-da-aceleracao-dos-distratos-nas-construtoras-do-minha-casa-minha-vida-bdap/"
+}
