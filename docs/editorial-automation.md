@@ -37,7 +37,7 @@ A API confia na integração n8n autenticada para comprovar a aprovação Telegr
 
 ## Testes e limites reais
 
-Em 18/11/2026 passaram 15 testes locais de autenticação, aprovação, alteração de conteúdo/imagem, formato, traversal, repetição, concorrência e falha de armazenamento. TypeScript também foi verificado. O teste completo n8n → Telegram → site ainda não foi executado: o controle da aba conectada do n8n falhou por timeout. Sem instalação, credenciais vinculadas e deploy inicial, este trabalho não representa um post publicado nem homologação da automação.
+Em 18/11/2026 passaram 20 testes locais (15 do backend e 5 dos contratos n8n) de autenticação, aprovação, alteração de conteúdo/imagem, formato, traversal, repetição, concorrência e falha de armazenamento. TypeScript também foi verificado. O teste completo n8n → Telegram → site ainda não foi executado: o controle da aba conectada do n8n falhou por timeout. Sem instalação, credenciais vinculadas e deploy inicial, este trabalho não representa um post publicado nem homologação da automação.
 
 Fonte inicial cadastrada: https://www.moneytimes.com.br/nao-e-so-a-caixa-ceo-da-direcional-aponta-outro-motivo-por-tras-da-aceleracao-dos-distratos-nas-construtoras-do-minha-casa-minha-vida-bdap/
 
