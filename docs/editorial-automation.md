@@ -8,11 +8,13 @@ Planilha: https://docs.google.com/spreadsheets/d/1AFDD8HpBYZi8d9BzW7KSxzddDtW0u7
 
 Issue de acompanhamento: https://github.com/Bonisengna/descomplicasa/issues/3
 
+PR de implementação: https://github.com/Bonisengna/descomplicasa/pull/4. O registro atualizado de instalação, modelos e execuções está em [editorial-mcp-installation.md](editorial-mcp-installation.md).
+
 ## Imagens e aprovação
 
 O fluxo consulta Wikimedia Commons, registra autor/licença/origem, baixa JPEG correlato e valida tamanho, assinatura e hash. Não gera imagens nem reutiliza automaticamente a foto da notícia. A identidade de quem aprova precisa corresponder ao usuário Telegram configurado. A aprovação vence em 24 horas e se refere ao JSON congelado do artigo, incluindo o SHA256 da fotografia. Alterar texto ou fotografia invalida a aprovação.
 
-O documento HTML final enviado ao Telegram contém a imagem embutida. Rejeição, ausência de resposta, identidade ausente ou expiração não levam à publicação. O template permanece inativo e com duas travas de configuração até homologação real dos parâmetros do Telegram e das credenciais.
+O documento HTML final enviado ao Telegram contém a imagem embutida. Rejeição, ausência de resposta, identidade ausente ou expiração não levam à publicação. O bot editorial dedicado passou no teste humano de aprovação, mas isso não comprova a entrega e aprovação do artigo MoneyTimes. O workflow permanece inativo e com `publishEnabled=false` até a implantação e autenticação do endpoint do site.
 
 ## Site e armazenamento
 
@@ -30,14 +32,14 @@ A API confia na integração n8n autenticada para comprovar a aprovação Telegr
 
 1. Revisar o PR e executar CI antes do merge. Aplicar o deploy inicial pelo mecanismo de releases já descrito em `docs/deployment.md`.
 2. No servidor, configurar `export EDITORIAL_CONTENT_DIR=/srv/descomplicaza/editorial`, `export EDITORIAL_PUBLISH_TOKEN=...` e `export EDITORIAL_APPROVER_IDS=...` no arquivo administrativo de ambiente. Os `export` são necessários porque o inicializador apenas carrega esse arquivo. Não salvar o token em Git. Criar o diretório persistente com acesso exclusivo ao usuário do site.
-3. Importar os dois JSONs em `automation/editorial`, vincular credenciais Google Sheets, Telegram, modelo disponível e Header Auth com `Authorization: Bearer ...` para o publicador. Manter acesso ao modelo em serviço já existente; Ollama é adaptador substituível, não requisito instalado.
-4. Configurar IDs reais do chat privado e usuário, origem pública, erro global e validar o schema de aprovação em uma exportação da versão real do n8n. Somente então liberar `configured` e `telegramSchemaVerified`.
+3. Para novas instalações, importar os snapshots sanitizados em `automation/editorial/mcp/`, vincular credenciais Google Sheets, bot Telegram dedicado, modelos disponíveis e Header Auth com `Authorization: Bearer ...` para o publicador. A instância configurada usa OpenAI `gpt-4.1-mini` primário e Groq `openai/gpt-oss-120b` fallback; os templates iniciais com Ollama são históricos. Os hashes da versão MCP usam Crypto nativo.
+4. Configurar IDs reais do chat privado e usuário, origem pública e handler de erro já publicado. Validar aprovação restrita ao usuário e a identidade da resposta antes de liberar `configured` e `telegramSchemaVerified`. O snapshot remove credenciais/ID pessoal e mantém as travas desligadas para a instalação de destino.
 5. Executar um único item manualmente. Conferir documento e fotografia no Telegram, aprovar, verificar URL, crédito, imagem, blog e sitemap. Reexecutar o mesmo pacote e comprovar ausência de duplicidade.
 6. Somente após homologação, decidir periodicidade e ativar um gatilho agendado. Esta versão usa entrada manual e processa um item por execução. Não executar concorrente: Google Sheets não oferece reserva transacional de fila. A API evita publicação duplicada, mas não elimina mensagens Telegram duplicadas de execuções concorrentes.
 
 ## Testes e limites reais
 
-Em 18/11/2026 passaram 20 testes locais (15 do backend e 5 dos contratos n8n) de autenticação, aprovação, alteração de conteúdo/imagem, formato, traversal, repetição, concorrência e falha de armazenamento. TypeScript também foi verificado. O teste completo n8n → Telegram → site ainda não foi executado: o controle da aba conectada do n8n falhou por timeout. Sem instalação, credenciais vinculadas e deploy inicial, este trabalho não representa um post publicado nem homologação da automação.
+Os testes locais cobrem autenticação, aprovação, alteração de conteúdo/imagem, formato, traversal, repetição, concorrência e falha de armazenamento. São distintos dos testes reais: a instância n8n foi instalada pelo MCP e o bot dedicado passou na aprovação humana (execução 1569). A preparação do artigo falhou na imagem na execução 1571; a correção para URL original do Commons permitiu selecionar, baixar e calcular hash da fotografia na execução 1573. Essa execução falhou depois na montagem porque o Crypto não preservou o binário. A correção de base64 e a prévia/aprovação final do artigo ainda precisam de confirmação no registro de instalação. A API do site não está homologada em produção; não há artigo publicado confirmado.
 
 Fonte inicial cadastrada: https://www.moneytimes.com.br/nao-e-so-a-caixa-ceo-da-direcional-aponta-outro-motivo-por-tras-da-aceleracao-dos-distratos-nas-construtoras-do-minha-casa-minha-vida-bdap/
 

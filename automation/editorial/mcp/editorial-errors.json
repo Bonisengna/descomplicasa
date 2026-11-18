@@ -1,5 +1,6 @@
 {
   "name": "DESCOMPLICAZA | Editorial | Erros e alertas",
+  "active": false,
   "nodes": [
     {
       "id": "d03eb3ab-1a82-409b-a953-a5fc985d9a7d",
@@ -42,7 +43,8 @@
         "additionalFields": {
           "appendAttribution": false
         }
-      }
+      },
+      "webhookId": "c0e1f5c3-5c66-4986-87b3-89cfa8de5037"
     }
   ],
   "connections": {
@@ -70,7 +72,15 @@
     }
   },
   "settings": {
-    "timezone": "America/Sao_Paulo"
+    "executionOrder": "v1",
+    "availableInMCP": true
   },
-  "active": false
+  "nodeGroups": [],
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "snapshotUpdatedAt": "2026-11-18T22:04:50.002Z",
+    "sanitized": true
+  }
 }
+

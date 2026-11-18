@@ -3,14 +3,14 @@ on:
   pull_request:
     paths:
       - 'lib/editorial-store.ts'
-      - 'tests/editorial.test.mjs'
+      - 'tests/editorial*.test.mjs'
       - 'automation/editorial/**'
       - '.github/workflows/editorial-tests.yml'
   push:
     branches: [main]
     paths:
       - 'lib/editorial-store.ts'
-      - 'tests/editorial.test.mjs'
+      - 'tests/editorial*.test.mjs'
       - 'automation/editorial/**'
       - '.github/workflows/editorial-tests.yml'
 permissions:
@@ -23,5 +23,7 @@ jobs:
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         with:
           node-version: '26'
-      - name: Test publication and workflow contracts
-        run: node --experimental-strip-types --test tests/editorial.test.mjs
+      - name: Test publication and candidate workflow contracts
+        env:
+          EDITORIAL_MCP_SNAPSHOT: automation/editorial/mcp/editorial-pipeline-candidate.json
+        run: node --experimental-strip-types --test tests/editorial*.test.mjs
