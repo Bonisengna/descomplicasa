@@ -573,7 +573,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        5920,
+        2400,
         0
       ]
     },
@@ -586,7 +586,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6144,
+        2624,
         0
       ]
     },
@@ -602,7 +602,7 @@
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.9,
       "position": [
-        6592,
+        3072,
         0
       ]
     },
@@ -619,8 +619,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
       "typeVersion": 1,
       "position": [
-        6608,
-        240
+        3208,
+        232
       ]
     },
     {
@@ -632,7 +632,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6944,
+        3424,
         0
       ]
     },
@@ -668,7 +668,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        7168,
+        3648,
         0
       ]
     },
@@ -681,7 +681,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7616,
+        4320,
         0
       ]
     },
@@ -697,7 +697,7 @@
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.9,
       "position": [
-        8176,
+        18560,
         0
       ]
     },
@@ -714,7 +714,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
       "typeVersion": 1,
       "position": [
-        8192,
+        18576,
         240
       ]
     },
@@ -727,7 +727,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        8528,
+        18912,
         0
       ]
     },
@@ -740,7 +740,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        9200,
+        19584,
         0
       ]
     },
@@ -860,7 +860,7 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        9536,
+        19920,
         240
       ]
     },
@@ -873,7 +873,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        9760,
+        20144,
         240
       ]
     },
@@ -891,7 +891,7 @@
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.1,
       "position": [
-        9984,
+        20368,
         240
       ]
     },
@@ -910,10 +910,9 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        10208,
+        20592,
         240
-      ],
-      "webhookId": "08edf8d1-53f9-4dea-90bd-a304a98f1a8a"
+      ]
     },
     {
       "parameters": {
@@ -943,10 +942,9 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        10656,
+        21040,
         240
-      ],
-      "webhookId": "b10c20f0-1d98-4f8e-9d46-b034e147dce6"
+      ]
     },
     {
       "parameters": {
@@ -957,7 +955,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        11328,
+        21712,
         240
       ]
     },
@@ -991,7 +989,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        11552,
+        21936,
         240
       ]
     },
@@ -999,6 +997,8 @@
       "parameters": {
         "method": "POST",
         "url": "={{ $('CONFIGURACAO').first().json.publishBaseUrl + '/api/editorial/publish' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({article:$json.article,approval:$json.approval,imageBase64:$json.imageBase64,imageMimeType:$json.imageMimeType}) }}",
@@ -1311,8 +1311,7 @@
       "position": [
         12304,
         144
-      ],
-      "webhookId": "2d4ddc63-dea4-44d8-82c9-ee63667d6682"
+      ]
     },
     {
       "parameters": {
@@ -1599,7 +1598,7 @@
       "type": "n8n-nodes-base.crypto",
       "typeVersion": 2,
       "position": [
-        7392,
+        4096,
         0
       ]
     },
@@ -1613,7 +1612,7 @@
       "type": "n8n-nodes-base.crypto",
       "typeVersion": 2,
       "position": [
-        8752,
+        19136,
         0
       ]
     },
@@ -1627,7 +1626,7 @@
       "type": "n8n-nodes-base.crypto",
       "typeVersion": 2,
       "position": [
-        8976,
+        19360,
         0
       ]
     },
@@ -1641,7 +1640,7 @@
       "type": "n8n-nodes-base.crypto",
       "typeVersion": 2,
       "position": [
-        10880,
+        21264,
         240
       ]
     },
@@ -1655,7 +1654,7 @@
       "type": "n8n-nodes-base.crypto",
       "typeVersion": 2,
       "position": [
-        11104,
+        21488,
         240
       ]
     },
@@ -1696,7 +1695,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        10432,
+        20816,
         240
       ]
     },
@@ -1712,7 +1711,6 @@
         2608,
         0
       ],
-      "webhookId": "9db79478-d5bd-4862-93e2-2bbdf716caf0",
       "disabled": true
     },
     {
@@ -1727,7 +1725,6 @@
         3408,
         0
       ],
-      "webhookId": "9b45690a-3cf9-4426-a1b2-e3b8b0714309",
       "disabled": true
     },
     {
@@ -1742,7 +1739,6 @@
         4208,
         0
       ],
-      "webhookId": "5c69d668-59f8-42e2-9570-1fdc162e78ce",
       "disabled": true
     },
     {
@@ -1757,7 +1753,6 @@
         5008,
         0
       ],
-      "webhookId": "c2eb98e1-165b-4a5b-9138-598ed5fea0c4",
       "disabled": true
     },
     {
@@ -1769,10 +1764,9 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        6368,
+        2848,
         0
       ],
-      "webhookId": "6cd7bd6f-a239-41a8-a74c-f1e360434c20",
       "disabled": true
     },
     {
@@ -1784,10 +1778,9 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        7952,
+        18336,
         0
       ],
-      "webhookId": "62b2a7c7-8b61-4e0b-bf45-b2ab2c17f054",
       "disabled": true
     },
     {
@@ -1936,8 +1929,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        6736,
-        240
+        3080,
+        232
       ]
     },
     {
@@ -1961,7 +1954,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        8320,
+        18704,
         240
       ]
     },
@@ -2065,6 +2058,9 @@
       ]
     },
     {
+      "parameters": {
+        "jsCode": "// Why Code: validar e serializar envelope imutável com prova de aprovação; não cabe em um único nó nativo.\nconst p=$('VALIDAR APROVACAO HUMANA').first().json,c=$('CONFIGURACAO').first().json,row=$('ESCOLHER UM ITEM').first().json;\nconst evidence=$('TELEGRAM - APROVAR OU REJEITAR').first().json.data||{};\nconst now=Date.now(),approvedAt=Date.parse(p.approval?.approvedAt);\nif(p.approved!==true||p.decision!=='APROVADO'||evidence.approved!==true||evidence.responder?.source!=='telegram'||String(evidence.chatId)!==String(c.chatId)||String(evidence.responder?.id)!==String(c.telegramUserId)||String(p.approval?.approvedBy)!==String(c.telegramUserId))throw new Error('Snapshot exige aprovação Telegram autenticada');\nif(!/^[a-f0-9]{64}$/.test(p.versionHash)||p.approval.versionHash!==p.versionHash||!/^[a-f0-9]{64}$/.test(p.imageBase64Hash))throw new Error('Hashes de aprovação inválidos');\nif(!Number.isFinite(p.expiresAt)||now>=p.expiresAt||!Number.isFinite(approvedAt)||approvedAt>now+60000||now-approvedAt>=86400000)throw new Error('Aprovação expirada');\nif(!Number.isInteger(Number(row.revisao))||Number(row.revisao)<1)throw new Error('Revisão inválida');\nconst key=String($workflow.id)+':'+String($execution.id)+':'+p.versionHash;\nconst payload={article:p.article,imageBase64:p.imageBase64,imageMimeType:p.imageMimeType,versionHash:p.versionHash,imageHash:p.imageHash,imageBase64Hash:p.imageBase64Hash,createdAt:p.createdAt,expiresAt:p.expiresAt,approved:true,approval:p.approval,decision:p.decision,approvalEvidence:evidence};\nconst payloadJson=JSON.stringify(payload);\nif(payloadJson.length>8000000)throw new Error('Snapshot excede tamanho permitido');\nreturn [{json:{snapshotKey:key,workflowId:String($workflow.id),executionId:String($execution.id),itemId:String(row.id),revision:Number(row.revisao),versionHash:p.versionHash,imageBase64Hash:p.imageBase64Hash,approvedBy:String(p.approval.approvedBy),approvedAt:p.approval.approvedAt,expiresAt:new Date(p.expiresAt).toISOString(),state:'APPROVED',payloadJson,publicUrl:''}}];"
+      },
       "id": "2a85e777-7e24-49b0-be2a-1aa4335792b0",
       "name": "PREPARAR SNAPSHOT APROVADO",
       "type": "n8n-nodes-base.code",
@@ -2072,23 +2068,10 @@
       "position": [
         1744,
         304
-      ],
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "// Why Code: validar e serializar envelope imutável com prova de aprovação; não cabe em um único nó nativo.\nconst p=$('VALIDAR APROVACAO HUMANA').first().json,c=$('CONFIGURACAO').first().json,row=$('ESCOLHER UM ITEM').first().json;\nconst evidence=$('TELEGRAM - APROVAR OU REJEITAR').first().json.data||{};\nconst now=Date.now(),approvedAt=Date.parse(p.approval?.approvedAt);\nif(p.approved!==true||p.decision!=='APROVADO'||evidence.approved!==true||evidence.responder?.source!=='telegram'||String(evidence.chatId)!==String(c.chatId)||String(evidence.responder?.id)!==String(c.telegramUserId)||String(p.approval?.approvedBy)!==String(c.telegramUserId))throw new Error('Snapshot exige aprovação Telegram autenticada');\nif(!/^[a-f0-9]{64}$/.test(p.versionHash)||p.approval.versionHash!==p.versionHash||!/^[a-f0-9]{64}$/.test(p.imageBase64Hash))throw new Error('Hashes de aprovação inválidos');\nif(!Number.isFinite(p.expiresAt)||now>=p.expiresAt||!Number.isFinite(approvedAt)||approvedAt>now+60000||now-approvedAt>=86400000)throw new Error('Aprovação expirada');\nif(!Number.isInteger(Number(row.revisao))||Number(row.revisao)<1)throw new Error('Revisão inválida');\nconst key=String($workflow.id)+':'+String($execution.id)+':'+p.versionHash;\nconst payload={article:p.article,imageBase64:p.imageBase64,imageMimeType:p.imageMimeType,versionHash:p.versionHash,imageHash:p.imageHash,imageBase64Hash:p.imageBase64Hash,createdAt:p.createdAt,expiresAt:p.expiresAt,approved:true,approval:p.approval,decision:p.decision,approvalEvidence:evidence};\nconst payloadJson=JSON.stringify(payload);\nif(payloadJson.length>8000000)throw new Error('Snapshot excede tamanho permitido');\nreturn [{json:{snapshotKey:key,workflowId:String($workflow.id),executionId:String($execution.id),itemId:String(row.id),revision:Number(row.revisao),versionHash:p.versionHash,imageBase64Hash:p.imageBase64Hash,approvedBy:String(p.approval.approvedBy),approvedAt:p.approval.approvedAt,expiresAt:new Date(p.expiresAt).toISOString(),state:'APPROVED',payloadJson,publicUrl:''}}];"
-      }
+      ]
     },
     {
-      "id": "e5da37c0-c185-4447-a01a-5ae5d15ba479",
-      "name": "SALVAR SNAPSHOT APROVADO",
-      "type": "n8n-nodes-base.dataTable",
-      "typeVersion": 1.1,
-      "position": [
-        2000,
-        304
-      ],
       "parameters": {
-        "resource": "row",
         "operation": "upsert",
         "dataTableId": {
           "__rl": true,
@@ -2101,7 +2084,6 @@
           "conditions": [
             {
               "keyName": "snapshotKey",
-              "condition": "eq",
               "keyValue": "={{ $json.snapshotKey }}"
             }
           ]
@@ -2244,17 +2226,17 @@
           ]
         },
         "options": {}
-      }
-    },
-    {
-      "id": "008b7352-176e-4af2-903f-0cde30a3be3e",
-      "name": "EXTRAIR BASE64 DA FOTO",
-      "type": "n8n-nodes-base.extractFromFile",
+      },
+      "id": "e5da37c0-c185-4447-a01a-5ae5d15ba479",
+      "name": "SALVAR SNAPSHOT APROVADO",
+      "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        2400,
-        600
-      ],
+        2000,
+        304
+      ]
+    },
+    {
       "parameters": {
         "operation": "binaryToPropery",
         "binaryPropertyName": "image",
@@ -2262,7 +2244,15 @@
         "options": {
           "keepSource": "both"
         }
-      }
+      },
+      "id": "008b7352-176e-4af2-903f-0cde30a3be3e",
+      "name": "EXTRAIR BASE64 DA FOTO",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        3872,
+        0
+      ]
     }
   ],
   "connections": {
@@ -3110,16 +3100,6 @@
       ]
     }
   },
-  "settings": {
-    "executionOrder": "v1",
-    "availableInMCP": true,
-    "timezone": "America/Sao_Paulo",
-    "saveExecutionProgress": true,
-    "saveManualExecutions": true,
-    "saveDataErrorExecution": "all",
-    "saveDataSuccessExecution": "all",
-    "binaryMode": "separate"
-  },
   "nodeGroups": [
     {
       "id": "43a9b2e6-c0ac-4c11-a770-b56981de03fc",
@@ -3241,10 +3221,7 @@
       "description": "Registra recusa ou expiração sem publicar."
     }
   ],
-  "pinData": {},
-  "meta": {
-    "templateCredsSetupCompleted": false,
-    "snapshotUpdatedAt": "2026-11-18T22:28:00.870Z",
-    "sanitized": true
+  "settings": {
+    "timezone": "America/Sao_Paulo"
   }
 }

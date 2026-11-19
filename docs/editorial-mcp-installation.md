@@ -1,5 +1,14 @@
 # Instalação editorial na instância n8n
 
+## Credencial do publicador e diagnóstico de autenticação
+
+A credencial dedicada criada pelo usuário foi confirmada e vinculada aos publicadores do principal e da retomada. O segredo não foi lido, copiado para parâmetros ou incluído nos exports. As travas de publicação permanecem false.
+
+Diagnóstico manual: https://n8n.caza85imoveis.com.br/workflow/gGhikk6DLvbFZE9s . A execução 1580 enviou somente `{}`, sem artigo, com e sem credencial, sem seguir redirecionamentos. Ambas as chamadas a `/api/editorial/publish` retornaram 404. Portanto, o vínculo da credencial está confirmado, mas o token ainda não foi validado pela API. A rota precisa ser implantada/disponibilizada antes do teste de autenticação. Nenhum artigo foi enviado nesse diagnóstico.
+
+Os checks de CI anteriores falharam por dois motivos: o compilador Next.js incluiu templates SDK operacionais de `automation/`, e a fixture de aprovação do teste legado não incluía chat e origem Telegram exigidos pelo validador. O escopo TypeScript agora separa os templates operacionais da aplicação; a fixture passou a incluir esses campos e casos negativos correspondentes. Não houve remoção das verificações de aprovação. A validação local concluiu 31 testes e TypeScript sem erros. A nova rodada CI será a evidência necessária antes de integrar e implantar.
+
+
 ## Aprovação humana confirmada — execução 1576
 
 Em 18/11/2026 às 20:35 (America/Sao_Paulo), a revisão 2 recebeu aprovação pelo Telegram. A execução 1576 terminou como Succeeded: validou a decisão, preparou e salvou o snapshot aprovado na Data Table e registrou APROVADO na FILA.

@@ -129,12 +129,13 @@ test('workflow configuration fails closed and accepts valid explicit settings',a
 test('workflow approval requires user identity, positive decision, live expiry and unchanged snapshot',async()=>{
   const w=await workflow(),run=codeNode(w,'VALIDAR APROVACAO HUMANA');
   const p=payload();const snapshot={...p,versionHash:p.approval.versionHash,imageHash:sha256(photo),expiresAt:Date.now()+60000};
-  const lookup=name=>({first:()=>({json:name==='CONGELAR VERSAO E PREVIEW'?snapshot:{telegramUserId:'123'}})});
+  const lookup=name=>({first:()=>({json:name==='CONGELAR VERSAO E PREVIEW'?snapshot:{telegramUserId:'123',chatId:'123'}})});
   const execute=data=>run({data},lookup,undefined,require);
-  assert.equal((await execute({approved:true,responder:{id:123}}))[0].json.approved,true);
-  for(const data of [{approved:false,responder:{id:123}},{approved:true,responder:{id:999}},{approved:true},{}]) assert.equal((await execute(data))[0].json.approved,false);
-  snapshot.expiresAt=Date.now()-1;assert.equal((await execute({approved:true,responder:{id:123}}))[0].json.approved,false);
-  snapshot.expiresAt=Date.now()+60000;snapshot.article.title='Alterado';await assert.rejects(execute({approved:true,responder:{id:123}}));
+  const accepted={approved:true,responder:{id:123,source:'telegram'},chatId:'123'};
+  assert.equal((await execute(accepted))[0].json.approved,true);
+  for(const data of [{...accepted,approved:false},{...accepted,responder:{id:999,source:'telegram'}},{...accepted,chatId:'999'},{...accepted,responder:{id:123,source:'web'}},{approved:true},{}]) assert.equal((await execute(data))[0].json.approved,false);
+  snapshot.expiresAt=Date.now()-1;assert.equal((await execute(accepted))[0].json.approved,false);
+  snapshot.expiresAt=Date.now()+60000;snapshot.article.title='Alterado';await assert.rejects(execute(accepted));
 });
 test('workflow preview escapes source text instead of executing HTML',async()=>{
   const w=await workflow(),run=codeNode(w,'CONGELAR VERSAO E PREVIEW');

@@ -23,7 +23,7 @@ jobs:
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         with:
           node-version: '26'
-      - name: Test publication and candidate workflow contracts
+      - name: Test publication and installed workflow contracts
         env:
-          EDITORIAL_MCP_SNAPSHOT: automation/editorial/mcp/editorial-pipeline-candidate.json
+          EDITORIAL_MCP_SNAPSHOT: automation/editorial/mcp/editorial-pipeline.json
         run: node --experimental-strip-types --test tests/editorial*.test.mjs
