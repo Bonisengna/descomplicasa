@@ -1,0 +1,78 @@
+{
+  "name": "DESCOMPLICAZA | Editorial | Erros",
+  "active": false,
+  "nodes": [
+    {
+      "id": "error-trigger",
+      "name": "FALHA EDITORIAL",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "error-safe",
+      "name": "SANITIZAR ALERTA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const e=$json; return [{json:{workflow:e.workflow?.name||'Editorial',execution_id:e.execution?.id||'',node:e.execution?.lastNodeExecuted||'',client_id:'descomplicaza',occurred_at:$now.setZone('America/Sao_Paulo').toISO(),category:'EDITORIAL_ERROR',message:'Falha na etapa editorial. Verifique a execução autenticada no n8n; conteúdo e credenciais omitidos.'}}];"
+      }
+    },
+    {
+      "id": "error-telegram",
+      "name": "TELEGRAM - ERRO",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        0
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "CONFIGURAR_CHAT_PRIVADO",
+        "text": "={{ JSON.stringify($json) }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      }
+    }
+  ],
+  "connections": {
+    "FALHA EDITORIAL": {
+      "main": [
+        [
+          {
+            "node": "SANITIZAR ALERTA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SANITIZAR ALERTA": {
+      "main": [
+        [
+          {
+            "node": "TELEGRAM - ERRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "America/Sao_Paulo",
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

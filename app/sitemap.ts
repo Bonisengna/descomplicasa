@@ -1,4 +1,6 @@
 import type { MetadataRoute } from "next";
+import { listArticles } from "@/lib/editorial-store";
+export const dynamic = "force-dynamic";
 import { absoluteUrl } from "@/lib/site";
 import { mcmvArticles } from "@/lib/mcmv-articles";
 
@@ -23,8 +25,9 @@ const publicRoutes = [
   "/politica-de-privacidade",
 ] as const;
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  return [...publicRoutes, ...mcmvArticles.map((article) => `/guias/${article.slug}`)].map((route) => ({
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const editorial = await listArticles();
+  return [...publicRoutes, ...mcmvArticles.map((article) => `/guias/${article.slug}`), ...editorial.map(a => `/blog/${a.slug}`)].map((route) => ({
     url: absoluteUrl(route),
   }));
 }

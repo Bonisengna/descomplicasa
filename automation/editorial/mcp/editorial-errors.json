@@ -1,0 +1,86 @@
+{
+  "name": "DESCOMPLICAZA | Editorial | Erros e alertas",
+  "active": false,
+  "nodes": [
+    {
+      "id": "d03eb3ab-1a82-409b-a953-a5fc985d9a7d",
+      "name": "FALHA EDITORIAL",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "794e46ee-a1ad-4cd6-968f-1efb0cf300a2",
+      "name": "SANITIZAR ALERTA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const e=$json; return [{json:{workflow:e.workflow?.name||'Editorial',execution_id:e.execution?.id||'',node:e.execution?.lastNodeExecuted||'',client_id:'descomplicaza',occurred_at:$now.setZone('America/Sao_Paulo').toISO(),category:'EDITORIAL_ERROR',message:'Falha na etapa editorial. Verifique a execução autenticada no n8n; conteúdo e credenciais omitidos.'}}];"
+      }
+    },
+    {
+      "id": "37fc9719-4040-4bf3-9ff9-7b4730c718f3",
+      "name": "TELEGRAM - ERRO",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "CONFIGURAR_ID_TELEGRAM",
+        "text": "={{ JSON.stringify($json) }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "webhookId": "c0e1f5c3-5c66-4986-87b3-89cfa8de5037"
+    }
+  ],
+  "connections": {
+    "FALHA EDITORIAL": {
+      "main": [
+        [
+          {
+            "node": "SANITIZAR ALERTA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SANITIZAR ALERTA": {
+      "main": [
+        [
+          {
+            "node": "TELEGRAM - ERRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "snapshotUpdatedAt": "2026-11-18T22:04:50.002Z",
+    "sanitized": true
+  }
+}
+

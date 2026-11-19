@@ -1,0 +1,165 @@
+{
+  "name": "DESCOMPLICAZA | Editorial | Testar autenticacao sem publicar",
+  "active": false,
+  "nodes": [
+    {
+      "id": "95bfeb3e-5494-4601-a158-1de3f0f04d82",
+      "name": "INICIAR TESTE AUTENTICACAO",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "ff019716-d227-4615-a040-d57045c80092",
+      "name": "TESTAR SEM CREDENCIAL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://descomplicaza.caza85imoveis.com.br/api/editorial/publish",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{}",
+        "options": {
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "text"
+            }
+          },
+          "timeout": 20000
+        },
+        "authentication": "none"
+      }
+    },
+    {
+      "id": "265b5a0a-d7a8-4375-81db-ebe618115d99",
+      "name": "TESTAR COM CREDENCIAL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://descomplicaza.caza85imoveis.com.br/api/editorial/publish",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{}",
+        "options": {
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "text"
+            }
+          },
+          "timeout": 20000
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      }
+    },
+    {
+      "id": "33608d4c-627e-48b3-9dd8-a27b9e24441e",
+      "name": "RESUMIR AUTENTICACAO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "u",
+              "name": "statusSemCredencial",
+              "type": "number",
+              "value": "={{ Number($('TESTAR SEM CREDENCIAL').first().json.statusCode || 0) }}"
+            },
+            {
+              "id": "a",
+              "name": "statusComCredencial",
+              "type": "number",
+              "value": "={{ Number($json.statusCode || 0) }}"
+            },
+            {
+              "id": "v",
+              "name": "autenticacaoVerificada",
+              "type": "boolean",
+              "value": "={{ $('TESTAR SEM CREDENCIAL').first().json.statusCode === 401 && $json.statusCode === 400 && String($json.body || '').includes('Artigo ausente') }}"
+            },
+            {
+              "id": "p",
+              "name": "artigoEnviado",
+              "type": "boolean",
+              "value": false
+            }
+          ]
+        },
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "INICIAR TESTE AUTENTICACAO": {
+      "main": [
+        [
+          {
+            "node": "TESTAR SEM CREDENCIAL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TESTAR SEM CREDENCIAL": {
+      "main": [
+        [
+          {
+            "node": "TESTAR COM CREDENCIAL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TESTAR COM CREDENCIAL": {
+      "main": [
+        [
+          {
+            "node": "RESUMIR AUTENTICACAO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [],
+  "settings": {
+    "timezone": "America/Sao_Paulo"
+  }
+}

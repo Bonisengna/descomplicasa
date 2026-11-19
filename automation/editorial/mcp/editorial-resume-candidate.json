@@ -1,0 +1,916 @@
+{
+  "name": "DESCOMPLICAZA | Editorial | Retomar snapshot aprovado",
+  "active": false,
+  "description": "Candidato local não aplicado: retoma apenas snapshot aprovado. Gates false; credencial de publicação pendente.",
+  "nodes": [
+    {
+      "name": "INICIAR RETOMADA MANUAL",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "parameters": {},
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "name": "CONFIGURAR RETOMADA",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "key",
+              "name": "snapshotKey",
+              "type": "string",
+              "value": "CONFIGURAR_CHAVE_DO_SNAPSHOT"
+            },
+            {
+              "id": "origin",
+              "name": "sourceWorkflowId",
+              "type": "string",
+              "value": "CONFIGURAR_WORKFLOW_ORIGEM"
+            },
+            {
+              "id": "publish",
+              "name": "publishEnabled",
+              "type": "boolean",
+              "value": false
+            },
+            {
+              "id": "credential",
+              "name": "publisherConfigured",
+              "type": "boolean",
+              "value": false
+            },
+            {
+              "id": "approver",
+              "name": "telegramUserId",
+              "type": "string",
+              "value": "CONFIGURAR_ID_TELEGRAM"
+            },
+            {
+              "id": "chat",
+              "name": "chatId",
+              "type": "string",
+              "value": "CONFIGURAR_ID_TELEGRAM"
+            },
+            {
+              "id": "site",
+              "name": "publishBaseUrl",
+              "type": "string",
+              "value": "https://descomplicaza.caza85imoveis.com.br"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "name": "VALIDAR CHAVE CONFIGURADA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const c=$json;const parts=String(c.snapshotKey||'').split(':');if(!/^[A-Za-z0-9_-]{1,100}$/.test(c.sourceWorkflowId)||parts.length!==3||parts[0]!==c.sourceWorkflowId||!/^\\d+$/.test(parts[1])||!/^[a-f0-9]{64}$/.test(parts[2]))throw new Error('Configure somente a chave de um snapshot aprovado existente');return [{json:c}];"
+      },
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "name": "LER SNAPSHOT APROVADO",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "CONFIGURAR_DATA_TABLE_ID",
+          "cachedResultName": "Descomplicaza Editorial Approved Snapshots"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "snapshotKey",
+              "condition": "eq",
+              "keyValue": "={{ $json.snapshotKey }}"
+            }
+          ]
+        },
+        "returnAll": false,
+        "limit": 2
+      },
+      "position": [
+        720,
+        0
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "name": "VALIDAR SNAPSHOT RECUPERADO",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Why Code: validar envelope persistido, identidade e prazo antes de restaurar o pacote aprovado.\nconst rows=$input.all(),c=$('CONFIGURAR RETOMADA').first().json;\nif(rows.length!==1||typeof rows[0].json.payloadJson!=='string')throw new Error('Snapshot ausente ou duplicado');\nconst r=rows[0].json;\nif(r.payloadJson.length>8000000||r.state!=='APPROVED'||r.snapshotKey!==c.snapshotKey||r.workflowId!==c.sourceWorkflowId)throw new Error('Snapshot não autorizado para retomada');\nconst p=JSON.parse(r.payloadJson),e=p.approvalEvidence||{},now=Date.now(),approvedAt=Date.parse(p.approval?.approvedAt);\nif(r.snapshotKey!==r.workflowId+':'+r.executionId+':'+p.versionHash||r.versionHash!==p.versionHash||r.imageBase64Hash!==p.imageBase64Hash||p.approval?.versionHash!==p.versionHash)throw new Error('Chave ou hashes de snapshot inconsistentes');\nif(!/^[a-f0-9]{64}$/.test(p.versionHash)||!/^[a-f0-9]{64}$/.test(p.imageBase64Hash)||!Number.isInteger(r.revision)||r.revision<1||!/^[A-Za-z0-9_-]{1,100}$/.test(r.itemId))throw new Error('Contrato de snapshot inválido');\nif(p.approved!==true||p.decision!=='APROVADO'||e.approved!==true||e.responder?.source!=='telegram'||String(e.responder?.id)!==String(c.telegramUserId)||String(e.chatId)!==String(c.chatId)||String(p.approval.approvedBy)!==String(c.telegramUserId)||String(r.approvedBy)!==String(c.telegramUserId))throw new Error('Identidade Telegram divergente');\nif(!Number.isFinite(p.createdAt)||!Number.isFinite(p.expiresAt)||p.createdAt>now+60000||p.expiresAt>p.createdAt+86400000||p.expiresAt<=p.createdAt||now>=p.expiresAt||Date.parse(r.expiresAt)!==p.expiresAt||!Number.isFinite(approvedAt)||approvedAt<p.createdAt-60000||approvedAt>now+60000||now-approvedAt>=86400000||Date.parse(r.approvedAt)!==approvedAt)throw new Error('Aprovação expirada ou datas inconsistentes');\nif(typeof p.imageBase64!=='string'||p.imageBase64.length>7000000||p.imageMimeType!=='image/jpeg'||!p.article||typeof p.article.slug!=='string'||!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(p.article.slug))throw new Error('Pacote editorial inválido');\nreturn [{json:{...p,id:r.itemId,revisao:r.revision,snapshotKey:r.snapshotKey,originalExecutionId:r.executionId}}];"
+      },
+      "position": [
+        960,
+        0
+      ]
+    },
+    {
+      "name": "HASH NATIVO - SNAPSHOT ARTIGO",
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 2,
+      "parameters": {
+        "action": "hash",
+        "type": "SHA256",
+        "value": "={{ JSON.stringify($json.article) }}",
+        "dataPropertyName": "checkedArticleHash"
+      },
+      "position": [
+        1200,
+        0
+      ]
+    },
+    {
+      "name": "HASH NATIVO - SNAPSHOT BASE64",
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 2,
+      "parameters": {
+        "action": "hash",
+        "type": "SHA256",
+        "value": "={{ $('VALIDAR SNAPSHOT RECUPERADO').first().json.imageBase64 }}",
+        "dataPropertyName": "checkedImageBase64Hash"
+      },
+      "position": [
+        1440,
+        0
+      ]
+    },
+    {
+      "name": "CONFERIR INTEGRIDADE SNAPSHOT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Why Code: comparar hashes e prazo e restaurar pacote após nós que substituem JSON.\nconst p=$('VALIDAR SNAPSHOT RECUPERADO').first().json;\nif($json.checkedArticleHash!==p.versionHash||$json.checkedImageBase64Hash!==p.imageBase64Hash)throw new Error('Snapshot alterado após aprovação');\nif(Date.now()>=p.expiresAt||Date.now()-Date.parse(p.approval.approvedAt)>=86400000)throw new Error('Aprovação expirada');\nreturn [{json:p}];"
+      },
+      "position": [
+        0,
+        200
+      ]
+    },
+    {
+      "name": "RECUPERACAO HABILITADA",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $('CONFIGURAR RETOMADA').first().json.publishEnabled }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            },
+            {
+              "leftValue": "={{ $('CONFIGURAR RETOMADA').first().json.publisherConfigured }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "position": [
+        240,
+        200
+      ]
+    },
+    {
+      "name": "RETOMADA BLOQUEADA",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "status",
+              "name": "status",
+              "type": "string",
+              "value": "SNAPSHOT_VALIDADO_PUBLICACAO_BLOQUEADA"
+            },
+            {
+              "id": "key",
+              "name": "snapshotKey",
+              "type": "string",
+              "value": "={{ $('VALIDAR SNAPSHOT RECUPERADO').first().json.snapshotKey }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "position": [
+        480,
+        200
+      ]
+    },
+    {
+      "name": "PUBLICAR NO SITE",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('CONFIGURAR RETOMADA').first().json.publishBaseUrl + '/api/editorial/publish' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({article:$json.article,approval:$json.approval,imageBase64:$json.imageBase64,imageMimeType:$json.imageMimeType}) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "position": [
+        720,
+        200
+      ]
+    },
+    {
+      "name": "VALIDAR RECIBO PUBLICACAO",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "jsCode": "const p=$('VALIDAR SNAPSHOT RECUPERADO').first().json;\nconst expected=$('CONFIGURAR RETOMADA').first().json.publishBaseUrl+'/blog/'+p.article.slug;\nif($json.versionHash!==p.versionHash||$json.slug!==p.article.slug||$json.publicUrl!==expected)throw new Error('Recibo não corresponde ao snapshot aprovado');\nreturn [{json:$json}];"
+      },
+      "position": [
+        960,
+        200
+      ]
+    },
+    {
+      "name": "VERIFICAR PAGINA PUBLICA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "parameters": {
+        "url": "={{ $json.publicUrl }}",
+        "options": {
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "text",
+              "outputPropertyName": "publicHtml"
+            }
+          },
+          "timeout": 20000
+        }
+      },
+      "position": [
+        1200,
+        200
+      ]
+    },
+    {
+      "name": "VALIDAR PAGINA PUBLICADA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "jsCode": "const a=$('VALIDAR SNAPSHOT RECUPERADO').first().json.article;\nconst escaped=a.title.replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#x27;'}[c]));\nif(typeof $json.publicHtml!=='string'||!$json.publicHtml.includes(escaped))throw new Error('Título da página pública não confirmado');\nreturn [{json:$('VALIDAR RECIBO PUBLICACAO').first().json}];"
+      },
+      "position": [
+        1440,
+        200
+      ]
+    },
+    {
+      "name": "VERIFICAR IMAGEM PUBLICA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "parameters": {
+        "url": "={{ $('CONFIGURAR RETOMADA').first().json.publishBaseUrl + $('VALIDAR SNAPSHOT RECUPERADO').first().json.article.image.src }}",
+        "options": {
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "publishedImage"
+            }
+          },
+          "timeout": 20000
+        }
+      },
+      "position": [
+        0,
+        400
+      ]
+    },
+    {
+      "name": "HASH NATIVO - IMAGEM PUBLICA",
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 2,
+      "parameters": {
+        "binaryData": true,
+        "binaryPropertyName": "publishedImage",
+        "dataPropertyName": "publishedImageHash"
+      },
+      "position": [
+        240,
+        400
+      ]
+    },
+    {
+      "name": "VALIDAR IMAGEM PUBLICADA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "jsCode": "if($json.publishedImageHash!==$('VALIDAR SNAPSHOT RECUPERADO').first().json.article.image.sha256)throw new Error('Hash da imagem pública divergente');return [{json:$('VALIDAR RECIBO PUBLICACAO').first().json}];"
+      },
+      "position": [
+        480,
+        400
+      ]
+    },
+    {
+      "name": "REGISTRAR PUBLICACAO",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1AFDD8HpBYZi8d9BzW7KSxzddDtW0u7G2DxeeGHv2tAQ"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1457473171",
+          "cachedResultName": "FILA"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('VALIDAR SNAPSHOT RECUPERADO').first().json.id }}",
+            "status": "PUBLICADO",
+            "etapa": "CONCLUIDO",
+            "decisao": "APROVAR",
+            "public_url": "={{ $('VALIDAR RECIBO PUBLICACAO').first().json.publicUrl }}",
+            "atualizado_em": "={{ $now.setZone('America/Sao_Paulo').toISO() }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": true,
+              "display": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "display": true
+            },
+            {
+              "id": "etapa",
+              "displayName": "etapa",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "display": true
+            },
+            {
+              "id": "decisao",
+              "displayName": "decisao",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "display": true
+            },
+            {
+              "id": "public_url",
+              "displayName": "public_url",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "display": true
+            },
+            {
+              "id": "atualizado_em",
+              "displayName": "atualizado_em",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "display": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "RAW"
+        }
+      },
+      "position": [
+        720,
+        400
+      ]
+    },
+    {
+      "name": "HISTORICO - PUBLICADO",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1AFDD8HpBYZi8d9BzW7KSxzddDtW0u7G2DxeeGHv2tAQ"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1096711880",
+          "cachedResultName": "HISTORICO"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "execucao_id": "={{ String($execution.id) }}",
+            "id": "={{ $('VALIDAR SNAPSHOT RECUPERADO').first().json.id }}",
+            "revisao": "={{ $('VALIDAR SNAPSHOT RECUPERADO').first().json.revisao }}",
+            "etapa": "CONCLUSAO",
+            "status": "PUBLICADO",
+            "inicio": "={{ new Date($('VALIDAR SNAPSHOT RECUPERADO').first().json.createdAt).toISOString() }}",
+            "fim": "={{ $now.setZone('America/Sao_Paulo').toISO() }}",
+            "tentativa": 1,
+            "mensagem": "={{ JSON.stringify({content_sha256:$('VALIDAR SNAPSHOT RECUPERADO').first().json.versionHash,decision:$('VALIDAR SNAPSHOT RECUPERADO').first().json.decision}) }}",
+            "public_url": "={{ $('VALIDAR RECIBO PUBLICACAO').first().json.publicUrl }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execucao_id",
+              "displayName": "execucao_id",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "display": true
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": true,
+              "display": true
+            },
+            {
+              "id": "revisao",
+              "displayName": "revisao",
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "display": true
+            },
+            {
+              "id": "etapa",
+              "displayName": "etapa",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "display": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "display": true
+            },
+            {
+              "id": "inicio",
+              "displayName": "inicio",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "display": true
+            },
+            {
+              "id": "fim",
+              "displayName": "fim",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "display": true
+            },
+            {
+              "id": "tentativa",
+              "displayName": "tentativa",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "display": true
+            },
+            {
+              "id": "mensagem",
+              "displayName": "mensagem",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "display": true
+            },
+            {
+              "id": "public_url",
+              "displayName": "public_url",
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "display": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "RAW"
+        }
+      },
+      "position": [
+        960,
+        400
+      ]
+    },
+    {
+      "name": "TELEGRAM - RESULTADO",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "parameters": {
+        "chatId": "={{ $('CONFIGURAR RETOMADA').first().json.chatId }}",
+        "text": "={{ 'Publicação registrada: ' + $('PUBLICAR NO SITE').first().json.publicUrl }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "position": [
+        1200,
+        400
+      ]
+    },
+    {
+      "name": "MARCAR SNAPSHOT PUBLICADO",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "CONFIGURAR_DATA_TABLE_ID",
+          "cachedResultName": "Descomplicaza Editorial Approved Snapshots"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "snapshotKey",
+              "condition": "eq",
+              "keyValue": "={{ $('VALIDAR SNAPSHOT RECUPERADO').first().json.snapshotKey }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "state": "PUBLISHED",
+            "publicUrl": "={{ $('VALIDAR RECIBO PUBLICACAO').first().json.publicUrl }}"
+          }
+        },
+        "options": {}
+      },
+      "position": [
+        1440,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "INICIAR RETOMADA MANUAL": {
+      "main": [
+        [
+          {
+            "node": "CONFIGURAR RETOMADA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CONFIGURAR RETOMADA": {
+      "main": [
+        [
+          {
+            "node": "VALIDAR CHAVE CONFIGURADA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDAR CHAVE CONFIGURADA": {
+      "main": [
+        [
+          {
+            "node": "LER SNAPSHOT APROVADO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LER SNAPSHOT APROVADO": {
+      "main": [
+        [
+          {
+            "node": "VALIDAR SNAPSHOT RECUPERADO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDAR SNAPSHOT RECUPERADO": {
+      "main": [
+        [
+          {
+            "node": "HASH NATIVO - SNAPSHOT ARTIGO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HASH NATIVO - SNAPSHOT ARTIGO": {
+      "main": [
+        [
+          {
+            "node": "HASH NATIVO - SNAPSHOT BASE64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HASH NATIVO - SNAPSHOT BASE64": {
+      "main": [
+        [
+          {
+            "node": "CONFERIR INTEGRIDADE SNAPSHOT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CONFERIR INTEGRIDADE SNAPSHOT": {
+      "main": [
+        [
+          {
+            "node": "RECUPERACAO HABILITADA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RECUPERACAO HABILITADA": {
+      "main": [
+        [
+          {
+            "node": "PUBLICAR NO SITE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RETOMADA BLOQUEADA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PUBLICAR NO SITE": {
+      "main": [
+        [
+          {
+            "node": "VALIDAR RECIBO PUBLICACAO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDAR RECIBO PUBLICACAO": {
+      "main": [
+        [
+          {
+            "node": "VERIFICAR PAGINA PUBLICA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VERIFICAR PAGINA PUBLICA": {
+      "main": [
+        [
+          {
+            "node": "VALIDAR PAGINA PUBLICADA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDAR PAGINA PUBLICADA": {
+      "main": [
+        [
+          {
+            "node": "VERIFICAR IMAGEM PUBLICA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VERIFICAR IMAGEM PUBLICA": {
+      "main": [
+        [
+          {
+            "node": "HASH NATIVO - IMAGEM PUBLICA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HASH NATIVO - IMAGEM PUBLICA": {
+      "main": [
+        [
+          {
+            "node": "VALIDAR IMAGEM PUBLICADA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDAR IMAGEM PUBLICADA": {
+      "main": [
+        [
+          {
+            "node": "MARCAR SNAPSHOT PUBLICADO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MARCAR SNAPSHOT PUBLICADO": {
+      "main": [
+        [
+          {
+            "node": "REGISTRAR PUBLICACAO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "REGISTRAR PUBLICACAO": {
+      "main": [
+        [
+          {
+            "node": "HISTORICO - PUBLICADO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HISTORICO - PUBLICADO": {
+      "main": [
+        [
+          {
+            "node": "TELEGRAM - RESULTADO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeGroups": [
+    {
+      "name": "Ler e validar versão aprovada",
+      "nodeNames": [
+        "CONFIGURAR RETOMADA",
+        "VALIDAR CHAVE CONFIGURADA",
+        "LER SNAPSHOT APROVADO",
+        "VALIDAR SNAPSHOT RECUPERADO",
+        "HASH NATIVO - SNAPSHOT ARTIGO",
+        "HASH NATIVO - SNAPSHOT BASE64",
+        "CONFERIR INTEGRIDADE SNAPSHOT"
+      ],
+      "description": "Lê somente snapshot persistido e verifica identidade, prazo e hashes sem gerar conteúdo."
+    },
+    {
+      "name": "Publicar e verificar resultado",
+      "nodeNames": [
+        "PUBLICAR NO SITE",
+        "VALIDAR RECIBO PUBLICACAO",
+        "VERIFICAR PAGINA PUBLICA",
+        "VALIDAR PAGINA PUBLICADA",
+        "VERIFICAR IMAGEM PUBLICA",
+        "HASH NATIVO - IMAGEM PUBLICA",
+        "VALIDAR IMAGEM PUBLICADA"
+      ],
+      "description": "Envia o pacote aprovado e verifica página e fotografia."
+    },
+    {
+      "name": "Registrar conclusão",
+      "nodeNames": [
+        "MARCAR SNAPSHOT PUBLICADO",
+        "REGISTRAR PUBLICACAO",
+        "HISTORICO - PUBLICADO",
+        "TELEGRAM - RESULTADO"
+      ],
+      "description": "Marca snapshot publicado e atualiza planilha e Telegram."
+    }
+  ],
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Sao_Paulo",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all"
+  }
+}
