@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
 import styles from "./PurchaseDemo.module.css";
 
@@ -55,7 +55,6 @@ function AnimatedAmount({ amount, delay, onComplete }: { amount: number; delay: 
 export function PurchaseDemo() {
   const cardRef = useRef<HTMLElement>(null);
   const finishCycleRef = useRef<(() => void) | null>(null);
-  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     const card = cardRef.current;
@@ -66,7 +65,7 @@ export function PurchaseDemo() {
 
     let visible = false;
     let replay: number | undefined;
-    const canPlay = () => visible && !document.hidden && !motion.matches && !paused;
+    const canPlay = () => visible && !document.hidden && !motion.matches;
 
     const stop = () => {
       window.clearTimeout(replay);
@@ -99,7 +98,6 @@ export function PurchaseDemo() {
     }, { threshold: visibleThreshold });
 
     stop();
-    card.dataset.cycleReady = "true";
     motion.addEventListener("change", updatePlayback);
     document.addEventListener("visibilitychange", updatePlayback);
     observer.observe(card);
@@ -110,10 +108,9 @@ export function PurchaseDemo() {
       motion.removeEventListener("change", updatePlayback);
       document.removeEventListener("visibilitychange", updatePlayback);
       finishCycleRef.current = null;
-      delete card.dataset.cycleReady;
       delete card.dataset.reveal;
     };
-  }, [paused]);
+  }, []);
 
   return (
     <section ref={cardRef} className={styles.card}>
@@ -131,9 +128,6 @@ export function PurchaseDemo() {
         </div>
       </dl>
       <p className={styles.note}>Valores ilustrativos. Use as calculadoras para estimar seus custos.</p>
-      <button className={styles.playback} type="button" onClick={() => setPaused(value => !value)}>
-        {paused ? "Retomar animação" : "Pausar animação"}
-      </button>
     </section>
   );
 }

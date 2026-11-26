@@ -1,6 +1,33 @@
 import { listArticles } from "@/lib/editorial-store";
+import styles from "@/app/blog/blog.module.css";
+
 export async function EditorialFeed() {
   const articles = await listArticles();
   if (!articles.length) return null;
-  return <section className="container" style={{paddingBlock:32}} aria-label="Notícias e análises"><h2>Notícias e análises</h2><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(260px, 1fr))",gap:24}}>{articles.map(a=><article key={a.slug} style={{border:"1px solid #d7e3da",borderRadius:12,overflow:"hidden"}}><img src={a.image.src} alt={a.image.alt} loading="lazy" style={{width:"100%",height:200,objectFit:"cover"}}/><div style={{padding:20}}><h3><a href={`/blog/${a.slug}`}>{a.title}</a></h3><p>{a.description}</p><a href={`/blog/${a.slug}`}>Ler artigo</a></div></article>)}</div></section>;
+
+  return (
+    <section className="container" style={{ paddingBlock: 32 }} aria-labelledby="editorial-feed-title">
+      <h2 id="editorial-feed-title">Notícias e análises</h2>
+      <div className={styles.editorialGrid}>
+        {articles.map(article => {
+          const titleId = `editorial-publication-${article.slug}`;
+          return (
+            <article key={article.slug}>
+              <a
+                className={`${styles.publicationLink} ${styles.editorialCard}`}
+                href={`/blog/${article.slug}`}
+                aria-labelledby={titleId}
+              >
+                <img src={article.image.src} alt={article.image.alt} loading="lazy" />
+                <div className={styles.editorialBody}>
+                  <h3 id={titleId}>{article.title}</h3>
+                  <p>{article.description}</p>
+                </div>
+              </a>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
 }
