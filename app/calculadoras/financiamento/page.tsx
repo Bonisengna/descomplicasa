@@ -35,7 +35,7 @@ export default function FinancingPage() {
               {balanceProfile.map((height, index) => (
                 <span
                   key={height}
-                  style={{ height: `${height}%`, "--bar-delay": `${80 + index * 32}ms` } as CSSProperties}
+                  style={{ height: `${height}%`, "--bar-delay": `${120 + index * 48}ms` } as CSSProperties}
                 />
               ))}
             </div>

@@ -16,9 +16,9 @@ const initialCosts = [
 const costs = [property, ...initialCosts];
 const total = initialCosts.reduce((sum, cost) => sum + cost.amount, 0);
 const formatAmount = new Intl.NumberFormat("pt-BR");
-const rowInterval = 340;
-const characterInterval = 45;
-const totalDelay = costs.length * rowInterval + 80;
+const rowInterval = 420;
+const characterInterval = 58;
+const totalDelay = costs.length * rowInterval + 120;
 const visibleThreshold = 0.2;
 
 function AnimatedAmount({ amount, delay, onComplete }: { amount: number; delay: number; onComplete?: () => void }) {

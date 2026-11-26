@@ -60,7 +60,7 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .heroChart > span {
-    animation: chart-bar-intro 460ms cubic-bezier(.23, 1, .32, 1) var(--bar-delay) backwards;
+    animation: chart-bar-intro 720ms cubic-bezier(.23, 1, .32, 1) var(--bar-delay) backwards;
   }
 }
 
