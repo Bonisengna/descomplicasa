@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import styles from "./PurchaseDemo.module.css";
 
@@ -19,6 +19,7 @@ const formatAmount = new Intl.NumberFormat("pt-BR");
 const rowInterval = 420;
 const characterInterval = 58;
 const totalDelay = costs.length * rowInterval + 120;
+const totalHoldMs = 3000;
 const visibleThreshold = 0.2;
 
 function AnimatedAmount({ amount, delay, onComplete }: { amount: number; delay: number; onComplete?: () => void }) {
@@ -53,38 +54,66 @@ function AnimatedAmount({ amount, delay, onComplete }: { amount: number; delay: 
 
 export function PurchaseDemo() {
   const cardRef = useRef<HTMLElement>(null);
+  const finishCycleRef = useRef<(() => void) | null>(null);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     const card = cardRef.current;
     if (!card || typeof IntersectionObserver === "undefined" || typeof matchMedia !== "function") return;
 
     const motion = matchMedia("(prefers-reduced-motion: reduce)");
-    if (motion.matches || typeof motion.addEventListener !== "function") return;
+    if (typeof motion.addEventListener !== "function") return;
+
+    let visible = false;
+    let replay: number | undefined;
+    const canPlay = () => visible && !document.hidden && !motion.matches && !paused;
+
+    const stop = () => {
+      window.clearTimeout(replay);
+      replay = undefined;
+      card.dataset.reveal = "complete";
+    };
+
+    const updatePlayback = () => {
+      if (!canPlay()) {
+        stop();
+      } else if (replay === undefined && card.dataset.reveal !== "playing") {
+        card.dataset.reveal = "playing";
+      }
+    };
+
+    finishCycleRef.current = () => {
+      if (card.dataset.reveal !== "playing") return;
+      card.dataset.reveal = "complete";
+      if (!canPlay()) return;
+
+      replay = window.setTimeout(() => {
+        replay = undefined;
+        updatePlayback();
+      }, totalHoldMs);
+    };
 
     const observer = new IntersectionObserver(([entry]) => {
-      if (!entry || entry.intersectionRatio < visibleThreshold || card.dataset.reveal !== "waiting") return;
-
-      observer.disconnect();
-      card.dataset.reveal = "playing";
+      visible = Boolean(entry && entry.intersectionRatio >= visibleThreshold);
+      updatePlayback();
     }, { threshold: visibleThreshold });
 
-    function handleMotionChange(event: MediaQueryListEvent) {
-      if (!event.matches || !card) return;
-
-      observer.disconnect();
-      card.dataset.reveal = "complete";
-    }
-
-    card.dataset.reveal = "waiting";
-    motion.addEventListener("change", handleMotionChange);
+    stop();
+    card.dataset.cycleReady = "true";
+    motion.addEventListener("change", updatePlayback);
+    document.addEventListener("visibilitychange", updatePlayback);
     observer.observe(card);
 
     return () => {
+      stop();
       observer.disconnect();
-      motion.removeEventListener("change", handleMotionChange);
+      motion.removeEventListener("change", updatePlayback);
+      document.removeEventListener("visibilitychange", updatePlayback);
+      finishCycleRef.current = null;
+      delete card.dataset.cycleReady;
       delete card.dataset.reveal;
     };
-  }, []);
+  }, [paused]);
 
   return (
     <section ref={cardRef} className={styles.card}>
@@ -98,12 +127,13 @@ export function PurchaseDemo() {
         ))}
         <div className={styles.total}>
           <dt>Custo inicial ilustrativo</dt>
-          <dd><AnimatedAmount amount={total} delay={totalDelay} onComplete={() => {
-            if (cardRef.current) cardRef.current.dataset.reveal = "complete";
-          }} /></dd>
+          <dd><AnimatedAmount amount={total} delay={totalDelay} onComplete={() => finishCycleRef.current?.()} /></dd>
         </div>
       </dl>
       <p className={styles.note}>Valores ilustrativos. Use as calculadoras para estimar seus custos.</p>
+      <button className={styles.playback} type="button" onClick={() => setPaused(value => !value)}>
+        {paused ? "Retomar animação" : "Pausar animação"}
+      </button>
     </section>
   );
 }

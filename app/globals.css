@@ -26,16 +26,16 @@ svg { display: block; }
   main h1,
   main[data-home] .brand-copy,
   [data-intro-lead] {
-    animation: page-intro 700ms cubic-bezier(.23, 1, .32, 1) backwards;
+    animation: page-intro 2s cubic-bezier(.25, .46, .45, .94) backwards;
   }
 
   main[data-home] .brand-copy {
     --intro-offset: 4px;
-    animation-duration: 620ms;
   }
 
   [data-intro-lead] {
     --intro-offset: 6px;
+    animation-duration: 1900ms;
     animation-delay: 100ms;
   }
 }
