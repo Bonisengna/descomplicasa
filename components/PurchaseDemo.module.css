@@ -1,0 +1,97 @@
+.card {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  padding: clamp(1rem, 3vw, 1.75rem);
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.card h2 {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.125rem, 2vw, 1.375rem);
+  line-height: 1.25;
+}
+
+.costs {
+  margin: 0;
+}
+
+.row,
+.total {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.row {
+  padding: 0.52rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.row dt {
+  color: var(--gray);
+}
+
+.costs dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  text-align: right;
+}
+
+.amount {
+  white-space: nowrap;
+}
+
+.character {
+  display: inline-block;
+  white-space: pre;
+}
+
+.total {
+  margin-top: 0.85rem;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background: var(--green-soft);
+  color: var(--green-dark);
+  font-weight: 700;
+}
+
+.total dd {
+  font-size: clamp(1.125rem, 2.5vw, 1.375rem);
+}
+
+.note {
+  margin: 0.75rem 0 0;
+  color: var(--gray);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.accessibleAmount {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .card[data-reveal="waiting"] .character {
+    opacity: 0;
+  }
+
+  .card[data-reveal="playing"] .character {
+    animation: reveal 1ms step-end var(--reveal-at) both;
+  }
+}
+
+@keyframes reveal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

@@ -1,96 +1,135 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
-import {
-  ArrowIcon,
-  BankIcon,
-  BoltIcon,
-  CalculatorIcon,
-  ChecklistIcon,
-  FileIcon,
-  FolderIcon,
-  HouseIcon,
-  PiggyIcon,
-  ShieldIcon,
-  StampIcon,
-} from "@/components/Icons";
+import { ArrowIcon } from "@/components/Icons";
+import { PurchaseDemo } from "@/components/PurchaseDemo";
+import styles from "./home.module.css";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
 const calculators = [
-  { title: "Financiamento", text: "Descubra quanto pode financiar e tenha uma noção das parcelas.", Icon: CalculatorIcon, href: "/calculadoras/financiamento" },
-  { title: "Amortização", text: "Simule um aporte único e veja quanto pode reduzir em prazo, parcela e juros.", Icon: CalculatorIcon, href: "/calculadoras/amortizacao" },
-  { title: "Faixa MCMV", text: "Descubra em qual faixa do Minha Casa Minha Vida sua renda familiar se enquadra.", Icon: HouseIcon, href: "/calculadoras/faixa-minha-casa-minha-vida" },
-  { title: "Entrada", text: "Veja quanto precisa juntar e organize os recursos para a compra.", Icon: PiggyIcon, href: "/calculadoras/entrada" },
-  { title: "ITBI", text: "Estime o imposto conforme município, valor da compra, financiamento e FGTS.", Icon: BankIcon, href: "/calculadoras/itbi" },
-  { title: "Escritura", text: "Saiba quando ela é necessária e quais custos considerar.", Icon: FileIcon },
-  { title: "Registro", text: "Entenda o registro e os custos para colocar o imóvel no seu nome.", Icon: StampIcon },
+  { title: "Financiamento", text: "Descubra quanto pode financiar e tenha uma noção das parcelas.", href: "/calculadoras/financiamento" },
+  { title: "Amortização", text: "Simule um aporte único e veja quanto pode reduzir em prazo, parcela e juros.", href: "/calculadoras/amortizacao" },
+  { title: "Faixa MCMV", text: "Descubra em qual faixa do Minha Casa Minha Vida sua renda familiar se enquadra.", href: "/calculadoras/faixa-minha-casa-minha-vida" },
+  { title: "Entrada", text: "Veja quanto precisa juntar e organize os recursos para a compra.", href: "/calculadoras/entrada" },
+  { title: "ITBI", text: "Estime o imposto conforme município, valor da compra, financiamento e FGTS.", href: "/calculadoras/itbi" },
 ];
 
 const checklists = [
-  { title: "Documentos MCMV", text: "Separe os principais documentos antes de procurar o banco.", Icon: FolderIcon, href: "/checklists/documentos-mcmv" },
-  { title: "Documentos", text: "Lista de documentos do comprador, vendedor e imóvel.", Icon: FolderIcon },
-  { title: "Visita", text: "O que observar no imóvel antes de tomar uma decisão.", Icon: HouseIcon },
-  { title: "Compra", text: "As principais etapas da negociação até as chaves.", Icon: ChecklistIcon },
+  { title: "Documentos MCMV", text: "Separe os principais documentos antes de procurar o banco.", href: "/checklists/documentos-mcmv" },
 ];
 
 const guides = [
-  { title: "Minha Casa Minha Vida", text: "Faixas de renda, subsídios, juros, FGTS e regras atualizadas para 2026.", className: "guide-financing", href: "/guias/minha-casa-minha-vida" },
-  { title: "Financiamento", text: "Como funciona, o que influencia a aprovação e quais custos observar.", className: "guide-financing", href: "/guias/financiamento" },
-  { title: "FGTS", text: "Como usar na compra, consultar saldo, liberar o banco e entender o Saque-Aniversário.", className: "guide-fgts", href: "/guias/fgts" },
-  { title: "ITBI", text: "O que é, quando é pago e por que o valor pode variar por município.", className: "guide-itbi", href: "/guias/itbi" },
-  { title: "Escritura", text: "Quando é necessária, quando o contrato financiado pode substituí-la e quanto custa.", className: "guide-deed", href: "/guias/escritura" },
-  { title: "Registro", text: "Por que registrar é essencial para formalizar a propriedade.", className: "guide-registry" },
+  { title: "Minha Casa Minha Vida", text: "Faixas de renda, subsídios, juros, FGTS e regras atualizadas para 2026.", href: "/guias/minha-casa-minha-vida" },
+  { title: "Financiamento", text: "Como funciona, o que influencia a aprovação e quais custos observar.", href: "/guias/financiamento" },
+  { title: "FGTS", text: "Como usar na compra, consultar saldo, liberar o banco e entender o Saque-Aniversário.", href: "/guias/fgts" },
+  { title: "ITBI", text: "O que é, quando é pago e por que o valor pode variar por município.", href: "/guias/itbi" },
+  { title: "Escritura", text: "Quando é necessária, quando o contrato financiado pode substituí-la e quanto custa.", href: "/guias/escritura" },
 ];
+
+type CatalogItem = {
+  title: string;
+  text: string;
+  href: string;
+};
+
+type CatalogSectionProps = {
+  id: string;
+  title: string;
+  description: string;
+  items: CatalogItem[];
+  comingSoon: string;
+};
+
+function CatalogSection({ id, title, description, items, comingSoon }: CatalogSectionProps) {
+  return (
+    <section className={styles.catalogSection} id={id} aria-labelledby={`${id}-titulo`}>
+      <div className={styles.catalogHeading}>
+        <h2 id={`${id}-titulo`}>{title}</h2>
+        <p>{description}</p>
+      </div>
+      <div>
+        <ul className={styles.catalogList}>
+          {items.map(({ title, text, href }) => (
+            <li key={href}>
+              <a className={styles.catalogLink} href={href}>
+                <div>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                </div>
+                <ArrowIcon />
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p className={styles.comingSoon}><strong>Em breve</strong> · {comingSoon}</p>
+      </div>
+    </section>
+  );
+}
 
 export default function Home() {
   return (
-    <main id="top">
+    <main id="top" className={styles.home}>
       <Header />
 
-      <section className="hero">
-        <div className="container hero-grid">
-          <div className="hero-copy">
-            <span className="eyebrow"><ShieldIcon /> Planeje. Verifique. Entenda.</span>
-            <h1>Vai comprar<br />um <span>imóvel?</span></h1>
-            <p className="hero-lead">Calcule custos, confira documentos e entenda cada etapa antes de fechar negócio.</p>
-            <div className="hero-actions">
-              <a className="button" href="/calculadoras/financiamento">Simular financiamento <ArrowIcon /></a>
-              <a className="button button-secondary" href="#checklists">Ver checklists</a>
+      <section className={styles.hero} aria-labelledby="hero-titulo">
+        <div className="container">
+          <div className={styles.introLayout}>
+            <div>
+              <div className={styles.heroIntro}>
+                <h1 id="hero-titulo">Vai comprar <span>um imóvel?</span></h1>
+                <p>Calcule custos, confira documentos e entenda cada etapa antes de fechar negócio.</p>
+              </div>
+              <div className={styles.actions}>
+                <a className={styles.primary} href="/calculadoras/financiamento">
+                  Simular financiamento <ArrowIcon />
+                </a>
+                <a className={styles.secondary} href="#checklists">Ver checklists</a>
+              </div>
+              <p className={styles.accessNote}>Ferramentas gratuitas e sem cadastro.</p>
             </div>
-            <div className="hero-benefits" aria-label="Benefícios">
-              <div><span className="mini-icon"><CalculatorIcon /></span><p><strong>Gratuito</strong><small>Ferramentas para começar sem custo.</small></p></div>
-              <div><span className="mini-icon"><ShieldIcon /></span><p><strong>Sem cadastro</strong><small>Use as ferramentas sem precisar criar uma conta.</small></p></div>
-              <div><span className="mini-icon"><BoltIcon /></span><p><strong>Direto ao ponto</strong><small>Informação organizada por etapa.</small></p></div>
-            </div>
-          </div>
-
-          <div className="hero-visual" aria-label="Exemplo de resumo de uma compra">
-            <div className="hero-blob" />
-            <svg className="house-drawing" viewBox="0 0 560 440" role="img" aria-label="Ilustração linear de uma casa">
-              <g fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M80 198 280 92l198 103" /><path d="M113 184v174h330V180" /><path d="M155 170 280 108l126 66" /><path d="M226 358V245h109v113" /><path d="M135 228h70v64h-70zM355 225h65v67h-65z" /><path d="M245 273h70M280 245v113" /><path d="M79 358h398" /><path d="M93 355c20-42 13-91-12-106-22 17-31 59-13 106" /><path d="M81 355v-75" />
-              </g>
-            </svg>
-            <div className="summary-card">
-              <div className="summary-heading"><div><small>Exemplo</small><h2>Resumo da sua compra</h2></div><span className="summary-check"><ShieldIcon /></span></div>
-              <dl><div><dt>Valor do imóvel</dt><dd>R$ 300.000</dd></div><div><dt>Entrada</dt><dd>R$ 60.000</dd></div><div><dt>ITBI estimado</dt><dd>R$ 9.000</dd></div><div><dt>Escritura</dt><dd>R$ 2.800</dd></div><div><dt>Registro</dt><dd>R$ 3.200</dd></div><div><dt>Outros custos</dt><dd>R$ 2.450</dd></div></dl>
-              <div className="summary-total"><span>Custo inicial ilustrativo</span><strong>R$ 77.450</strong></div>
-              <p className="summary-note">Valores apenas ilustrativos. Use as ferramentas para fazer suas próprias estimativas.</p>
+            <div className={styles.demo}>
+              <PurchaseDemo />
             </div>
           </div>
         </div>
       </section>
 
-      <section className="section" id="calculadoras"><div className="container"><div className="section-heading"><div><span className="kicker">Comece pelos números</span><h2>Calculadoras</h2><p>Entenda os principais custos e organize cada etapa da compra.</p></div><span className="coming-link">5 calculadoras já disponíveis</span></div><div className="calculator-grid">{calculators.map(({ title, text, Icon, href }) => (<article className="tool-card" key={title}><span className="tool-icon"><Icon /></span><h3>{title}</h3><p>{text}</p>{href ? <a className="status-pill" href={href}>Calcular agora →</a> : <span className="status-pill">Em breve</span>}</article>))}</div></div></section>
+      <div className="container">
+        <CatalogSection
+          id="calculadoras"
+          title="Calculadoras"
+          description="Estime os valores que entram no orçamento da compra."
+          items={calculators}
+          comingSoon="Escritura e registro"
+        />
+        <CatalogSection
+          id="checklists"
+          title="Checklists"
+          description="Organize o que você precisa conferir antes de avançar."
+          items={checklists}
+          comingSoon="Documentos da compra, visita e etapas da compra"
+        />
+        <CatalogSection
+          id="guias"
+          title="Guias"
+          description="Entenda as regras, os custos e as decisões da compra."
+          items={guides}
+          comingSoon="Registro"
+        />
+      </div>
 
-      <section className="section section-soft" id="checklists"><div className="container"><div className="section-heading"><div><span className="kicker">Não esqueça nada importante</span><h2>Checklists</h2><p>Organize o que precisa ser conferido antes de avançar na compra.</p></div><span className="coming-link">Documentos MCMV já disponível</span></div><div className="checklist-grid">{checklists.map(({ title, text, Icon, href }) => (<article className="check-card" key={title}><span className="check-icon"><Icon /></span><div><h3>{title}</h3><p>{text}</p>{href ? <a className="text-status" href={href}>Abrir checklist →</a> : <span className="text-status">Em breve</span>}</div></article>))}</div></div></section>
-
-      <section className="section" id="guias"><div className="container"><div className="section-heading"><div><span className="kicker">Entenda como funciona</span><h2>Guias</h2><p>Conteúdo prático para entender termos, custos e decisões da compra.</p></div><span className="coming-link">5 guias já disponíveis</span></div><div className="guides-grid">{guides.map((guide) => (<article className="guide-card" key={guide.title}><div className={`guide-visual ${guide.className}`} aria-hidden="true"><span>{guide.title}</span></div><div className="guide-body"><h3>{guide.title}</h3><p>{guide.text}</p>{guide.href ? <a className="text-status" href={guide.href}>Ler guia →</a> : <span className="text-status">Em breve</span>}</div></article>))}</div></div></section>
-
-      <section className="about-section" id="sobre"><div className="container about-grid"><div><span className="kicker">Por que existe</span><h2>Comprar um imóvel tem muita informação espalhada.</h2></div><div><p>O DescompliCAZA nasce para reunir ferramentas e conteúdo em uma experiência simples: calcular, conferir e entender antes de decidir.</p><p className="about-disclaimer">O conteúdo tem caráter informativo e não substitui análise jurídica, registral, bancária ou técnica quando necessária.</p></div></div></section>
-      <section className="final-cta"><div className="container final-cta-inner"><div><span className="brand-inline"><span className="brand-dot" /> DescompliCAZA</span><h2>Tudo o que você precisa entender antes de comprar um imóvel.</h2></div><a className="button button-light" href="/calculadoras/financiamento">Simular financiamento <ArrowIcon /></a></div></section>
+      <section className={styles.about} id="sobre" aria-labelledby="sobre-titulo">
+        <div className={`container ${styles.aboutGrid}`}>
+          <h2 id="sobre-titulo">Sobre o DescompliCAZA</h2>
+          <div>
+            <p>Reunimos ferramentas e orientações para ajudar você a planejar a compra do seu imóvel, dos primeiros cálculos até a documentação.</p>
+            <p className={styles.disclaimer}>O conteúdo tem caráter informativo e não substitui análise jurídica, registral, bancária ou técnica quando necessária.</p>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
