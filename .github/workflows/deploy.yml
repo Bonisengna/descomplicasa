@@ -8,6 +8,11 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      release_revision:
+        description: Exact SHA of the current production release to deliver again
+        required: false
+        type: string
 
 concurrency:
   group: descomplicaza-${{ github.ref }}
@@ -19,6 +24,7 @@ defaults:
 
 jobs:
   build:
+    if: github.event_name != 'workflow_dispatch' || inputs.release_revision == ''
     runs-on: ubuntu-24.04-arm
     permissions:
       contents: read
@@ -137,7 +143,10 @@ jobs:
             --notes "ARM64 production candidate built and validated by GitHub Actions."
 
   deliver:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: >-
+      always() && github.ref == 'refs/heads/main' &&
+      ((github.event_name == 'push' && needs.publish.result == 'success') ||
+       (github.event_name == 'workflow_dispatch' && inputs.release_revision != ''))
     needs: publish
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -155,7 +164,7 @@ jobs:
 
       - name: Signal the exact published revision
         env:
-          RELEASE_ID: ${{ github.sha }}
+          RELEASE_ID: ${{ inputs.release_revision || github.sha }}
           SIGNAL_HOST: ${{ secrets.DEPLOY_SIGNAL_HOST }}
           SIGNAL_TOKEN: ${{ secrets.DEPLOY_SIGNAL_TOKEN }}
         run: |
@@ -170,16 +179,24 @@ jobs:
 
       - name: Verify the public revision
         env:
-          RELEASE_ID: ${{ github.sha }}
+          RELEASE_ID: ${{ inputs.release_revision || github.sha }}
           SITE_URL: ${{ vars.SITE_URL || 'https://descomplicaza.caza85imoveis.com.br' }}
         run: |
           set -euo pipefail
           deadline=$((SECONDS + 120))
+          response="$RUNNER_TEMP/descomplicaza-health.json"
           while (( SECONDS < deadline )); do
-            if response=$(curl --silent --fail --connect-timeout 4 --max-time 6 "${SITE_URL%/}/api/health") \
-              && jq -e --arg sha "$RELEASE_ID" '.status == "ok" and .revision == $sha' <<< "$response" >/dev/null; then
-              printf 'Public revision %s is healthy.\n' "$RELEASE_ID"
-              exit 0
+            if status=$(curl --silent --connect-timeout 4 --max-time 6 --output "$response" \
+              --write-out '%{http_code}' "${SITE_URL%/}/api/health"); then
+              if [[ "$status" == 403 ]]; then
+                echo "::warning::The public domain rejected the GitHub runner (HTTP 403). The phone verified the deployed SHA and n8n. Verify the public route from an approved network."
+                exit 0
+              fi
+              if [[ "$status" == 200 ]] && jq -e --arg sha "$RELEASE_ID" \
+                '.status == "ok" and .revision == $sha' "$response" >/dev/null; then
+                printf 'Public revision %s is healthy.\n' "$RELEASE_ID"
+                exit 0
+              fi
             fi
             sleep 5
           done

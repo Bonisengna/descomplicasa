@@ -13,7 +13,7 @@ O job de entrega entra no Tailscale com uma identidade OIDC efêmera e chama a p
 5. O pacote é baixado para um diretório temporário e seu SHA-256 é conferido.
 6. `deploy-release.sh` testa a revisão em `127.0.0.1:3100`; somente depois troca o link `current` e reinicia `descomplicaza`. Se o PRoot não encerrar no prazo do restart gracioso, o script força o restart apenas desse serviço de aplicação.
 7. Se o novo site não ficar saudável, o link anterior é restaurado automaticamente.
-8. O receptor confere a revisão local e a saúde do n8n. O job `deliver` confirma o mesmo SHA no endpoint público.
+8. O receptor confere a revisão local e a saúde do n8n. O job `deliver` aguarda o mesmo SHA no endpoint público. Se o domínio devolver HTTP 403 ao runner, o job registra um aviso e a verificação pública deve ser feita de uma rede com acesso.
 
 O n8n nunca é reiniciado, atualizado ou reconfigurado por esses scripts. Seu `/healthz` funciona apenas como trava de segurança antes e depois da troca.
 
@@ -88,7 +88,13 @@ Depois do primeiro teste manual, instale o receptor de eventos. Qualquer falha n
 3. Na política do Tailscale, permita ao `tag:ci` chegar à porta TCP 8787 do Moto G30. O receptor vincula o socket ao IP privado e aceita apenas o SHA exato da release atual. Mantenha a porta fora do proxy público.
 4. Faça um push em `main`. O job `deliver` deve terminar com o mesmo SHA no [endpoint público de saúde](https://descomplicaza.caza85imoveis.com.br/api/health).
 
-Para acompanhar o telefone, use `tail -n 40 "$PREFIX/var/log/descomplicaza-signal/current"` no Termux. Se o telefone estiver offline, reexecute o job `deliver` da release atual quando ele voltar. A instalação manual abaixo continua disponível.
+Para acompanhar o telefone, use `tail -n 40 "$PREFIX/var/log/descomplicaza-signal/current"` no Termux. Se o telefone estiver offline, aguarde a reconexão e repita a entrega com o SHA completo da release atual:
+
+```sh
+gh workflow run deploy.yml --ref main -f release_revision=SHA_COMPLETO_DA_RELEASE
+```
+
+Esse comando reaproveita a release publicada, e o telefone só aceita o SHA que ainda é o atual. A instalação manual abaixo continua disponível.
 
 ## Consulta manual
 
