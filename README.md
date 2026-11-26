@@ -520,7 +520,7 @@ Por padrão, o Next.js inicia na porta `3000`.
 
 ## Deploy atual
 
-O build de produção é executado em ARM64 pelo GitHub Actions e publicado como uma GitHub Release. O Moto G30 busca essa release por HTTPS a cada 30 dias ou por comando manual. O GitHub não abre conexão com o telefone e não armazena senha, chave SSH ou token do Tailscale.
+Após um push em `main`, o GitHub Actions compila em ARM64 e publica uma GitHub Release. Em seguida, avisa o receptor privado do Moto G30 pelo Tailscale. O telefone consulta o GitHub nesse momento e instala o artefato validado.
 
 O servidor valida origem, revisão, checksum e a nova versão em uma porta canário antes de trocar a release ativa. Falhas no restart ou no health check restauram automaticamente a versão anterior. O serviço n8n é apenas verificado e nunca é reiniciado pelo pipeline.
 

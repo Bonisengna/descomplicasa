@@ -77,6 +77,9 @@ jobs:
       - name: Test release discovery and verified download
         run: ops/test-pull-release.sh
 
+      - name: Test authenticated deployment signals
+        run: node --test ops/test-deploy-signal.mjs
+
       - name: Upload workflow artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -132,3 +135,45 @@ jobs:
             --target "$RELEASE_ID" \
             --title "Deploy $RELEASE_ID" \
             --notes "ARM64 production candidate built and validated by GitHub Actions."
+
+  deliver:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: publish
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    environment: production
+    permissions:
+      id-token: write
+    steps:
+      - name: Join the private tailnet as an ephemeral runner
+        uses: tailscale/github-action@064b10558093f38325e838ddea35486bdc6b1d5c # v4.4.0
+        with:
+          oauth-client-id: ${{ vars.TS_OAUTH_CLIENT_ID }}
+          audience: ${{ vars.TS_AUDIENCE }}
+          tags: tag:ci
+          ping: ${{ secrets.DEPLOY_SIGNAL_HOST }}
+
+      - name: Signal the exact published revision
+        env:
+          RELEASE_ID: ${{ github.sha }}
+          SIGNAL_HOST: ${{ secrets.DEPLOY_SIGNAL_HOST }}
+          SIGNAL_TOKEN: ${{ secrets.DEPLOY_SIGNAL_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$SIGNAL_HOST"
+          [[ "$SIGNAL_TOKEN" =~ ^[a-f0-9]{64}$ ]]
+          [[ "$RELEASE_ID" =~ ^[a-f0-9]{40}$ ]]
+          curl --noproxy '*' --silent --show-error --fail-with-body --connect-timeout 15 --max-time 480 \
+            --header "Authorization: Bearer $SIGNAL_TOKEN" --request POST \
+            "http://$SIGNAL_HOST:8787/deploy/$RELEASE_ID" \
+            | jq -e --arg sha "$RELEASE_ID" '.status == "ok" and .revision == $sha'
+
+      - name: Verify the public revision
+        env:
+          RELEASE_ID: ${{ github.sha }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://descomplicaza.caza85imoveis.com.br' }}
+        run: |
+          set -euo pipefail
+          curl --silent --show-error --fail --retry 4 --retry-delay 5 --max-time 10 \
+            "${SITE_URL%/}/api/health" \
+            | jq -e --arg sha "$RELEASE_ID" '.status == "ok" and .revision == $sha'

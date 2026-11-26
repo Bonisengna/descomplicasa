@@ -22,6 +22,35 @@ button, input { font: inherit; }
 svg { display: block; }
 .container { width: min(var(--container), calc(100% - 48px)); margin: 0 auto; }
 
+@media (prefers-reduced-motion: no-preference) {
+  main h1,
+  main[data-home] .brand-copy,
+  [data-intro-lead] {
+    animation: page-intro 420ms cubic-bezier(.23, 1, .32, 1) backwards;
+  }
+
+  main[data-home] .brand-copy {
+    --intro-offset: 4px;
+    animation-duration: 360ms;
+  }
+
+  [data-intro-lead] {
+    --intro-offset: 6px;
+    animation-delay: 60ms;
+  }
+}
+
+@keyframes page-intro {
+  from {
+    opacity: .24;
+    transform: translateY(var(--intro-offset, 8px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .site-header { position: sticky; top: 0; z-index: 40; border-bottom: 1px solid rgba(221, 232, 224, .85); background: rgba(250, 252, 250, .92); backdrop-filter: blur(16px); }
 .header-inner { min-height: 92px; display: flex; align-items: center; justify-content: space-between; gap: 32px; }
 .brand { display: flex; align-items: flex-start; gap: 13px; max-width: 285px; }

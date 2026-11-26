@@ -19,10 +19,68 @@
 .breadcrumb strong { color: var(--graphite); font-weight: 600; }
 
 .heroGrid {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: 1.15fr .65fr;
   gap: 70px;
   align-items: end;
+}
+
+.heroChart {
+  position: absolute;
+  z-index: -1;
+  inset-block-start: 30px;
+  inset-inline-end: 0;
+  width: min(41%, 400px);
+  height: clamp(112px, 14vw, 164px);
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  align-items: end;
+  gap: clamp(4px, 1vw, 12px);
+  padding-inline: 3%;
+  background: repeating-linear-gradient(
+    to top,
+    color-mix(in srgb, var(--green) 10%, transparent) 0 1px,
+    transparent 1px 25%
+  );
+  opacity: .72;
+  pointer-events: none;
+}
+
+.heroChart > span {
+  border-radius: 5px 5px 0 0;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--green) 8%, transparent),
+    color-mix(in srgb, var(--green) 28%, transparent)
+  );
+  transform-origin: bottom;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .heroChart > span {
+    animation: chart-bar-intro 460ms cubic-bezier(.23, 1, .32, 1) var(--bar-delay) backwards;
+  }
+}
+
+@keyframes chart-bar-intro {
+  from { opacity: 0; transform: scaleY(.88); }
+  to { opacity: 1; transform: scaleY(1); }
+}
+
+@media (max-width: 900px) {
+  .heroChart {
+    width: 44%;
+    opacity: .36;
+  }
+}
+
+@media (max-width: 620px) {
+  .heroChart {
+    width: 57%;
+    opacity: .27;
+  }
 }
 
 .kicker {

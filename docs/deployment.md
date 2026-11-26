@@ -1,18 +1,19 @@
 # Deploy seguro no Moto G30
 
-O deploy usa um modelo de busca: o GitHub compila o Next.js em ARM64 e publica dois arquivos em uma Release pública. Um serviço separado no Moto G30 consulta o GitHub a cada 30 dias e só instala uma revisão depois de validar a origem dos arquivos, o SHA-256, uma inicialização em porta canário e a saúde do site e do n8n. Também é possível iniciar essa consulta manualmente a qualquer momento.
+Um push em `main` dispara o build ARM64 e a publicação de uma GitHub Release. O job `deliver` avisa o receptor privado do Moto G30 pelo Tailscale depois que a release está pronta. Só então o telefone consulta o GitHub e instala a revisão verificada.
 
-O GitHub não abre uma conexão com o telefone. Não há senha, chave SSH, token do Tailscale ou outro segredo permanente no repositório. O `GITHUB_TOKEN` usado para publicar a Release é temporário, fornecido pelo próprio GitHub Actions e limitado ao job de publicação.
+O job de entrega entra no Tailscale com uma identidade OIDC efêmera e chama a porta privada 8787 do Moto G30. A conexão não usa SSH. O receptor autentica a chamada com um token de uso exclusivo dessa função.
 
 ## Fluxo
 
 1. Pull requests executam build, auditoria e testes, mas não publicam nem instalam nada.
 2. Um push aprovado em `main` gera a tag `deploy-<SHA completo>` e publica `descomplicaza.tar.gz` e `descomplicaza.tar.gz.sha256`.
-3. O serviço `descomplicaza-pull` no telefone lê apenas a Release de produção mais recente.
+3. O serviço `descomplicaza-signal` recebe o SHA publicado e confirma que corresponde à release atual. O instalador busca a tag exata.
 4. O telefone exige que a tag, o commit e as URLs dos dois arquivos correspondam exatamente a `Bonisengna/descomplicasa`.
 5. O pacote é baixado para um diretório temporário e seu SHA-256 é conferido.
 6. `deploy-release.sh` testa a revisão em `127.0.0.1:3100`; somente depois troca o link `current` e reinicia `descomplicaza`. Se o PRoot não encerrar no prazo do restart gracioso, o script força o restart apenas desse serviço de aplicação.
 7. Se o novo site não ficar saudável, o link anterior é restaurado automaticamente.
+8. O receptor confere a revisão local e a saúde do n8n. O job `deliver` confirma o mesmo SHA no endpoint público.
 
 O n8n nunca é reiniciado, atualizado ou reconfigurado por esses scripts. Seu `/healthz` funciona apenas como trava de segurança antes e depois da troca.
 
@@ -23,6 +24,7 @@ Os scripts de controle devem ficar em um diretório administrativo que uma relea
 ```text
 /usr/local/lib/descomplicaza-deploy/
   deploy-release.sh
+  deploy-signal.mjs
   parse-release.mjs
   pull-loop.sh
   pull-release.sh
@@ -46,7 +48,7 @@ A configuração também fica fora da aplicação, normalmente em `/etc/descompl
 | `CANARY_PORT` | `3100` | Porta temporária de validação |
 | `GITHUB_REPOSITORY` | `Bonisengna/descomplicasa` | Origem permitida |
 | `DEPLOY_TOOL_DIR` | `/usr/local/lib/descomplicaza-deploy` | Scripts administrativos |
-| `PULL_INTERVAL_SECONDS` | `2592000` | Intervalo de 30 dias; mínimo 60 |
+| `PULL_INTERVAL_SECONDS` | `2592000` | Intervalo do serviço legado, mantido desativado no deploy por evento |
 
 ## Bootstrap único
 
@@ -77,11 +79,20 @@ O bootstrap:
 
 Se o telefone reiniciar depois desse bootstrap, o inicializador novo ainda consegue abrir o build legado. O arquivo anterior também fica salvo como `/usr/local/bin/descomplicaza-start.pre-cicd`.
 
-O buscador só deve ser ativado depois do primeiro teste manual. Qualquer falha de rede ou validação preserva a versão que já está no ar.
+Depois do primeiro teste manual, instale o receptor de eventos. Qualquer falha na entrega ou na validação preserva a versão que estiver saudável.
+
+## Ativação única do receptor
+
+1. No Termux com o bootstrap anterior instalado, execute `sh ops/bootstrap-deploy-signal.sh <IP-privado-do-Moto-G30>`. O script instala o serviço `descomplicaza-signal`, testa a resposta na rede privada e desativa o buscador periódico.
+2. No ambiente `production` do GitHub, configure `TS_OAUTH_CLIENT_ID` e `TS_AUDIENCE` como variáveis, e `DEPLOY_SIGNAL_HOST` e `DEPLOY_SIGNAL_TOKEN` como secrets. O token gerado no telefone fica em `/usr/local/lib/descomplicaza-deploy/deploy-signal.token`, com permissões locais restritas.
+3. Na política do Tailscale, permita ao `tag:ci` chegar à porta TCP 8787 do Moto G30. O receptor vincula o socket ao IP privado e aceita apenas o SHA exato da release atual. Mantenha a porta fora do proxy público.
+4. Faça um push em `main`. O job `deliver` deve terminar com o mesmo SHA no [endpoint público de saúde](https://descomplicaza.caza85imoveis.com.br/api/health).
+
+Para acompanhar o telefone, use `tail -n 40 "$PREFIX/var/log/descomplicaza-signal/current"` no Termux. Se o telefone estiver offline, reexecute o job `deliver` da release atual quando ele voltar. A instalação manual abaixo continua disponível.
 
 ## Consulta manual
 
-Para procurar e instalar uma nova versão sem esperar os 30 dias:
+Para instalar a release atual manualmente em caso de indisponibilidade do receptor:
 
 No Termux:
 
@@ -90,19 +101,7 @@ proot-distro login debian -- sh -lc \
   '. /etc/descomplicaza.env && /usr/local/lib/descomplicaza-deploy/pull-release.sh'
 ```
 
-Depois de conferir o site e o n8n, ative a verificação automática de 30 dias no Termux:
-
-```sh
-rm /data/data/com.termux/files/usr/var/service/descomplicaza-pull/down
-sv up /data/data/com.termux/files/usr/var/service/descomplicaza-pull
-sv status /data/data/com.termux/files/usr/var/service/descomplicaza-pull
-```
-
-Se uma consulta automática já estiver em andamento, o comando manual termina sem iniciar um segundo deploy. Depois que o serviço runit estiver instalado, reiniciá-lo também força uma consulta imediata:
-
-```sh
-sv restart /data/data/com.termux/files/usr/var/service/descomplicaza-pull
-```
+Se uma instalação estiver em andamento, o comando manual termina sem iniciar um segundo deploy.
 
 ## Rollback
 
@@ -124,7 +123,7 @@ O rollback também passa pela porta canário e restaura a versão original se su
 
 ## Tailscale
 
-O Tailscale continua útil para chegar ao endereço privado do telefone e administrar o OpenSSH do Termux na porta 8022, mas não participa do deploy automático. O comando `tailscale` não precisa existir dentro do Termux ou do Debian para este modelo funcionar. As variáveis `TS_OAUTH_CLIENT_ID` e `TS_AUDIENCE` não são lidas pelo workflow e podem ser removidas depois que este modelo estiver validado.
+O app Tailscale do telefone precisa estar conectado. O GitHub Actions entra na rede privada apenas durante o job de entrega. O OpenSSH do Termux fica disponível para manutenção separada.
 
 ## Proteções recomendadas no GitHub
 

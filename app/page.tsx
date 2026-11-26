@@ -71,7 +71,7 @@ function CatalogSection({ id, title, description, items, comingSoon }: CatalogSe
 
 export default function Home() {
   return (
-    <main id="top" className={styles.home}>
+    <main id="top" className={styles.home} data-home>
       <Header />
 
       <section className={styles.hero} aria-labelledby="hero-titulo">
@@ -80,7 +80,7 @@ export default function Home() {
             <div>
               <div className={styles.heroIntro}>
                 <h1 id="hero-titulo">Vai comprar <span>um imóvel?</span></h1>
-                <p>Calcule custos, confira documentos e entenda cada etapa antes de fechar negócio.</p>
+                <p data-intro-lead>Calcule custos, confira documentos e entenda cada etapa antes de fechar negócio.</p>
               </div>
               <div className={styles.actions}>
                 <a className={styles.primary} href="/calculadoras/financiamento">

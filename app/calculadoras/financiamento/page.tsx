@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import { Header } from "@/components/Header";
 import { FinancingCalculator } from "./FinancingCalculator";
 import { BankSimulators } from "./BankSimulators";
 import styles from "./financiamento.module.css";
+
+// Forma ilustrativa da queda do saldo devedor ao longo do tempo.
+const balanceProfile = [100, 90, 80, 70, 60, 50, 40, 30, 20, 10];
 
 export const metadata: Metadata = {
   alternates: { canonical: "/calculadoras/financiamento" },
@@ -27,6 +31,15 @@ export default function FinancingPage() {
           </nav>
 
           <div className={styles.heroGrid}>
+            <div className={styles.heroChart} aria-hidden="true">
+              {balanceProfile.map((height, index) => (
+                <span
+                  key={height}
+                  style={{ height: `${height}%`, "--bar-delay": `${80 + index * 32}ms` } as CSSProperties}
+                />
+              ))}
+            </div>
+
             <div>
               <span className={styles.kicker}>Calculadora gratuita</span>
               <h1>Simule seu financiamento imobiliário.</h1>
